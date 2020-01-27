@@ -104,19 +104,22 @@ class PipelineGenerator(object):
         # parameters to make it more efficient
         list_files = tf.data.experimental.make_csv_dataset(
             self._dataset_file,
-            batch_size=1,
+            batch_size=32,
             num_epochs=1,
             label_name=self._label_name,
-            prefetch_buffer_size=None,
+            prefetch_buffer_size=1,
             num_rows_for_inference=100,
             compression_type=None,
             ignore_errors=False,
             **self._kwargs)
-        
+
         # Parse the data and load the images.
         # NOTE: Check the documentation of map for caching and other optimizations.
         # TODO: Test and support flat-map for "single-all" mode.
-        dataset_images = list_files.map(self._parse_data,  num_parallel_calls=self._AUTOTUNE)
+        if self._mode == "single-all":
+            dataset_images = list_files.flat_map(self._parse_data, num_parallel_calls=self._AUTOTUNE) # TODO: to be tested.
+        else:
+            dataset_images = list_files.map(self._parse_data,  num_parallel_calls=self._AUTOTUNE)
 
         # TODO: @Darshan, we need to parse data first in the pipeline before shuffle and repeat and batch operations.
         # TODO: Since doing that with make_csv_dataset is not possible, I think we can use the basic pipeline methods.
