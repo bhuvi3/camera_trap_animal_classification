@@ -116,10 +116,7 @@ class PipelineGenerator(object):
         # Parse the data and load the images.
         # NOTE: Check the documentation of map for caching and other optimizations.
         # TODO: Test and support flat-map for "single-all" mode.
-        if self._mode == "single-all":
-            dataset_images = list_files.flat_map(self._parse_data) # TODO: to be tested.
-        else:
-            dataset_images = list_files.map(self._parse_data,  num_parallel_calls=self._AUTOTUNE)
+        dataset_images = list_files.map(self._parse_data,  num_parallel_calls=self._AUTOTUNE)
 
         # TODO: @Darshan, we need to parse data first in the pipeline before shuffle and repeat and batch operations.
         # TODO: Since doing that with make_csv_dataset is not possible, I think we can use the basic pipeline methods.
