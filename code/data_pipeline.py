@@ -104,7 +104,7 @@ class PipelineGenerator(object):
         # parameters to make it more efficient
         list_files = tf.data.experimental.make_csv_dataset(
             self._dataset_file,
-            batch_size=32,
+            batch_size=1, # TODO: Fails to load in batches. Only one image present in batch while the labels are correct.
             num_epochs=1,
             label_name=self._label_name,
             prefetch_buffer_size=1,
@@ -117,7 +117,7 @@ class PipelineGenerator(object):
         # NOTE: Check the documentation of map for caching and other optimizations.
         # TODO: Test and support flat-map for "single-all" mode.
         if self._mode == "single-all":
-            dataset_images = list_files.flat_map(self._parse_data, num_parallel_calls=self._AUTOTUNE) # TODO: to be tested.
+            dataset_images = list_files.flat_map(self._parse_data) # TODO: to be tested.
         else:
             dataset_images = list_files.map(self._parse_data,  num_parallel_calls=self._AUTOTUNE)
 
