@@ -1,3 +1,4 @@
+import pandas as pd
 import tensorflow as tf
 
 
@@ -7,41 +8,88 @@ class PipelineGenerator(object):
     (yet to come). Takes as input a CSV file which lists the images that needs
     to be loaded and transformed.
     
+    NOTE: The dataset must have paths of the images in the sequences stored in 
+          columns with names starting from 'image1', 'image2', and so on.
+    
     Parameters:
     -----------
     dataset_file: Path to the CSV file containing the list of images and labels.
     
     images_dir: Path to the directory containing the images to be loaded.
     
+    sequence_image_count: The number of images in each sequence. Default is 3.
+    
     label_name: Name of the column in the CSV file corresponding to the label.
                 Default is 'has_animal'.
                 
+    mode: The string representing the mode in which the data needs to be loaded. 
+          For possible modes and definitions, check the 'Attributes' section. 
+          Default is MODE_ALL.
+          
+    image_idx: Used when the selected mode is MODE_SINGLE. Specifies the index 
+               of the image that needs to be picked. Must be > 0 and 
+               <= sequence_image_count. Default is 1.
+
     resize: Specifies the size to which the images must be resized. Default is
             None. Must be provided as a list of integers specifying width and
-            height.
-
-    mode: The string representing the mode in which the data needs to be loaded. Default: "all".
-        Supported modes:
-            - "all": A datapoint contains all three images ('image1', 'image2', 'image3') in the sequence
-                as a dictionary.
-            - "single-all": A datapoint contains a single image, but all images in the sequence are considered.
-            - "single-image1": A datapoint contains a single image, the first image in the sequence.
-            - "single-image2": A datapoint contains a single image, the second image in the sequence.
-            - "single-image3": A datapoint contains a single image, the third image in the sequence.
+            height. If None, no resizing is done.
+            
+    shuffle_buffer_size: Specifies the buffer size to use to shuffle the CSV
+                         records. Check tensorflow.data.Dataset.shuffle() 
+                         documentation for more details.
 
     kwargs: Any additional keywords argument that needs to be passed to the 
             make_csv_dataset function of TensorFlow.
+            
+    Attributes:
+    -----------
+    MODE_ALL: Configuration to make the pipeline return all the images in a 
+              dictionary with key as the original column name.
     
+    MODE_FLAT_ALL: Configuration to make the pipeline returns all the images of 
+                   the sequence one by one.
+    
+    MODE_SINGLE: Configuration to the pipeline return only the selected image 
+                 from the sequence. Choice of image is specified by the 
+                 parameter `image_idx`.
+            
     """
     
-    def __init__(self, dataset_file, images_dir, label_name='has_animal', mode="all", resize=None, **kwargs):
+    MODE_ALL = "mode_all"
+    MODE_FLAT_ALL = "mode_flat_all"
+    MODE_SINGLE = "mode_single"
+    
+    
+    def __init__(self, dataset_file, images_dir, sequence_image_count=3, 
+                 label_name='has_animal', mode=MODE_ALL, image_idx=1, 
+                 resize=None, shuffle_buffer_size=10000, **kwargs):
+        self._modes = [self.MODE_ALL, self.MODE_FLAT_ALL, self.MODE_SINGLE]
         self._dataset_file = dataset_file
         self._images_dir = images_dir
+        self._sequence_image_count = sequence_image_count
         self._label_name = label_name
         self._mode = mode
+        self._image_idx = image_idx
         self._resize = resize
+        self._shuffle_buffer_size = shuffle_buffer_size
         self._kwargs = kwargs
         self._AUTOTUNE = tf.data.experimental.AUTOTUNE
+        
+        if self._mode not in self._modes:
+            raise ValueError("Invalid mode. Please select one from {}."\
+                             .format(self._modes))
+        
+        if (self._mode == self.MODE_SINGLE and 
+            (self._image_idx <= 0 or 
+             self._image_idx > self._sequence_image_count)):
+            raise IndexError("Image index is out of bounds.")
+        
+        if self._mode == self.MODE_ALL:
+            self._parse_data = self._parse_data_all
+        elif self._mode == self.MODE_FLAT_ALL:
+            self._parse_data = self._parse_data_flat
+        else:
+            self._parse_data = self._parse_data_single
 
 
     def _decode_img(self, img):
@@ -56,38 +104,42 @@ class PipelineGenerator(object):
             img = tf.image.resize(img, self._resize, name="resize-input")
 
         return img
-
     
-    def _parse_data(self, metadata, label):
-        if self._mode == "all":
-            data_point = {}
-
-            # Read each image and add to dictionary
-            for img_name in ['image1', 'image2', 'image3']:
-                img = tf.io.read_file(tf.strings.join([self._images_dir, metadata[img_name]])[0])
-                img = self._decode_img(img)
-                data_point[img_name] = img
-
-            return data_point, label
-
-        elif self._mode == "single-all":
-            # Note that this mode must be used in a flat-map.
-            datapoints = []
-            for img_name in ['image1', 'image2', 'image3']:
-                img = tf.io.read_file(tf.strings.join([self._images_dir, metadata[img_name]])[0])
-                img = self._decode_img(img)
-                datapoints.append((img, label))
-
-            return datapoints
-
-        elif self._mode.startswith("single-"):
-            image_name = self._mode.split('-')[-1]
-            img = tf.io.read_file(tf.strings.join([self._images_dir, metadata[image_name]])[0])
+    
+    def _parse_data_all(self, metadata, label):
+        data_point = {}
+        
+        # Read each image and add to dictionary
+        for img_num in range(1, self._sequence_image_count + 1):
+            img_name = "image" + str(img_num)
+            img = tf.io.read_file(tf.strings.join([
+                self._images_dir, metadata[img_name]]))
             img = self._decode_img(img)
-            return img, label
+            data_point[img_name] = img
 
-        else:
-            raise ValueError("The provided mode is not supported: %s" % self._mode)
+        return data_point, label
+    
+    
+    def _parse_data_single(self, metadata, label):
+        img = tf.io.read_file(tf.strings.join([
+                self._images_dir, metadata["image" + str(self._image_idx)]]))
+        img = self._decode_img(img)
+        
+        return img, label
+    
+    
+    def _parse_data_flat(self, metadata, label):
+        images, labels = [], []
+        
+        # Read each image and add to list
+        for img_num in range(1, self._sequence_image_count + 1):
+            img = tf.io.read_file(tf.strings.join([
+                self._images_dir, metadata["image" + str(img_num)]]))
+            img = self._decode_img(img)
+            images.append(img)
+            labels.append(label)
+        
+        return tf.data.Dataset.from_tensor_slices((images, labels))
     
 
     def get_pipeline(self):
@@ -96,29 +148,28 @@ class PipelineGenerator(object):
         
         Returns:
         --------
-        dataset_images: A tf.data.Dataset pipeline object.
+        dataset_images: A tensorflow.data.Dataset pipeline object.
         
         """
         # Create a dataset with records from the CSV file.
-        # NOTE: Check the documentation of make_csv_dataset and adjust the
-        # parameters to make it more efficient
-        list_files = tf.data.experimental.make_csv_dataset(
-            self._dataset_file,
-            batch_size=1, # TODO: Fails to load in batches. Only one image present in batch while the labels are correct.
-            num_epochs=1,
-            label_name=self._label_name,
-            prefetch_buffer_size=1,
-            num_rows_for_inference=100,
-            compression_type=None,
-            ignore_errors=False,
-            **self._kwargs)
-
+        data_csv = pd.read_csv(self._dataset_file)
+        image_col_names = ["image" + str(img_num) \
+                           for img_num in range(1, self._sequence_image_count + 1)]
+        file_paths = data_csv[image_col_names]
+        labels = data_csv[[self._label_name]]
+        dataset_files = \
+            tf.data.Dataset.from_tensor_slices((file_paths.to_dict('list'), 
+                                                labels.values.reshape(-1, ))) \
+                           .shuffle(buffer_size=self._shuffle_buffer_size, 
+                                    reshuffle_each_iteration=True)
+        
         # Parse the data and load the images.
-        # NOTE: Check the documentation of map for caching and other optimizations.
-        # TODO: Test and support flat-map for "single-all" mode.
-        dataset_images = list_files.map(self._parse_data,  num_parallel_calls=self._AUTOTUNE)
-
-        # TODO: @Darshan, we need to parse data first in the pipeline before shuffle and repeat and batch operations.
-        # TODO: Since doing that with make_csv_dataset is not possible, I think we can use the basic pipeline methods.
-
+        if self._mode == self.MODE_FLAT_ALL:
+            dataset_images = \
+                dataset_files.flat_map(self._parse_data)
+        else:
+            dataset_images = \
+                dataset_files.map(self._parse_data, 
+                                  num_parallel_calls=self._AUTOTUNE)
+        
         return dataset_images
