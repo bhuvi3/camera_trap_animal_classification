@@ -36,7 +36,7 @@ class PipelineGenerator(object):
             
     shuffle_buffer_size: Specifies the buffer size to use to shuffle the CSV
                          records. Check tensorflow.data.Dataset.shuffle() 
-                         documentation for more details.
+                         documentation for more details. Default is 10000.
 
     kwargs: Any additional keywords argument that needs to be passed to the 
             make_csv_dataset function of TensorFlow.
