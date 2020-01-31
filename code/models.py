@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 """
 This module contains the Tensorflow Keras models.
@@ -34,11 +35,11 @@ def _add_dense_block(units, inputs, is_training, name_prefix, kernel_regularizer
     return dropout
 
 
-def vgg16(input_shape, is_training, num_classes=1):
+def vgg16(input_shape, is_training=False, num_classes=1):
     """
     Builds a vgg16 model with Batchnorm and Dropout layers.
 
-    :param input_shape: THe shape of the input images (do not consider the batch-dimension).
+    :param input_shape: The shape of the input images (do not consider the batch-dimension).
     :param is_training: Flag to denote if the model would be used in training mode or not.
     :param num_classes: The number of classes. If it is binary classification, use num_classes=1.
     :return: The constructed tf.Keras model (Functional).
@@ -81,37 +82,3 @@ def vgg16(input_shape, is_training, num_classes=1):
     model = keras.Model(inputs=inputs, outputs=predictions, name="vgg16_BN_model")
 
     return model
-
-
-def train():
-    # TODO: Move it to train pipeline.
-    model = vgg16((256, 256, 3), True, num_classes=1)
-    model.compile(optimizer=keras.optimizers.Adam(lr=0.001),
-                  loss='binary_crossentropy',
-                  metrics=['accuracy'])
-
-    # Prepare the training dataset
-    train_dataset = get_training_dataset # TODO
-    train_dataset = train_dataset.shuffle(buffer_size=1024, reshuffle_each_iteration=True).batch(64)
-    class_weight = {0: 1., 1: 0.5}  # if class "0" is twice less represented than class "1" in your data. # TODO
-
-    # Prepare the validation dataset
-    val_dataset = get_val_dataset # TODO
-    val_dataset = val_dataset.batch(64)
-
-    earlystop_callback = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.001, patience=10)
-    best_model_checkpoint_callback = keras.callbacks.ModelCheckpoint(filepath=filepath, # TODO
-                                                                     mode='max',
-                                                                     monitor='val_acc',
-                                                                     save_best_only=True)
-    tensorboard_callback = keras.callbacks.TensorBoard(log_dir='./Graph', # TODO
-                                                       write_graph=True,
-                                                       write_images=True)
-    # TODO: Find a way to log the activation maps, either during training, or after the training has completed.
-
-    model.fit(train_dataset, epochs=3,
-              # Only run validation using the first 10 batches of the dataset
-              # using the `validation_steps` argument
-              validation_data=val_dataset, validation_steps=10,  # TODO: All steps for 1 epoch.
-              callbacks=[earlystop_callback, best_model_checkpoint_callback, tensorboard_callback],
-              class_weight=class_weight)

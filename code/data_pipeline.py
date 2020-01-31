@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+
+"""
+Contains the code to build the Data Input Pipeline for TensorFlow models.
+
+"""
+
 import pandas as pd
 import tensorflow as tf
 
@@ -33,7 +40,9 @@ class PipelineGenerator(object):
     resize: Specifies the size to which the images must be resized. Default is
             None. Must be provided as a list of integers specifying width and
             height. If None, no resizing is done.
-            
+
+    perform_shuffle: Specify if the dataset needs to be shuffled. Default: True.
+
     shuffle_buffer_size: Specifies the buffer size to use to shuffle the CSV
                          records. Check tensorflow.data.Dataset.shuffle() 
                          documentation for more details. Default is 10000.
@@ -62,7 +71,7 @@ class PipelineGenerator(object):
     
     def __init__(self, dataset_file, images_dir, sequence_image_count=3, 
                  label_name='has_animal', mode=MODE_ALL, image_idx=1, 
-                 resize=None, shuffle_buffer_size=10000, **kwargs):
+                 resize=None, perform_shuffle=True, shuffle_buffer_size=10000, **kwargs):
         self._modes = [self.MODE_ALL, self.MODE_FLAT_ALL, self.MODE_SINGLE]
         self._dataset_file = dataset_file
         self._images_dir = images_dir
@@ -71,6 +80,7 @@ class PipelineGenerator(object):
         self._mode = mode
         self._image_idx = image_idx
         self._resize = resize
+        self._perform_shuffle = perform_shuffle
         self._shuffle_buffer_size = shuffle_buffer_size
         self._kwargs = kwargs
         self._AUTOTUNE = tf.data.experimental.AUTOTUNE
@@ -157,11 +167,10 @@ class PipelineGenerator(object):
                            for img_num in range(1, self._sequence_image_count + 1)]
         file_paths = data_csv[image_col_names]
         labels = data_csv[[self._label_name]]
-        dataset_files = \
-            tf.data.Dataset.from_tensor_slices((file_paths.to_dict('list'), 
-                                                labels.values.reshape(-1, ))) \
-                           .shuffle(buffer_size=self._shuffle_buffer_size, 
-                                    reshuffle_each_iteration=True)
+        dataset_files = tf.data.Dataset.from_tensor_slices((file_paths.to_dict('list'), labels.values.reshape(-1, )))
+
+        if self._perform_shuffle:
+            dataset_files = dataset_files.shuffle(buffer_size=self._shuffle_buffer_size, reshuffle_each_iteration=True)
         
         # Parse the data and load the images.
         if self._mode == self.MODE_FLAT_ALL:
