@@ -2,7 +2,8 @@ Capstone Project Commands
 
 # VM:
 bhuvanvm: ssh msbhuvan@13.64.190.226
-cpumachine-1: ssh msbhuvan@13.88.24.197
+cpumachine-1: ssh vm@13.93.138.112
+cpumachine-2: ssh vm@104.42.152.252
 
 # Mounting the disk:
 dmesg | grep SCSI # get <>
@@ -16,7 +17,7 @@ sudo vi /etc/fstab
 save and restart (sudo reboot)
 
 # Connecting to Jupyter
-with_ssh_tunnel_for_Jupyter: ssh -N -f -L localhost:8889:localhost:8889 msbhuvan@13.64.190.226
+with_ssh_tunnel_for_Jupyter: ssh -N -f -L localhost:8889:localhost:8889 vm@104.42.152.252
 stop connection: sudo netstat -lpn |grep :8889 # and kill the shown PID.
 starting jupyter: jupyter notebook --no-browser --port=8889 --allow-root &> jupyter.log
 cat jupyter.log
@@ -33,9 +34,9 @@ def resize_images_dir(src_dir, dest_dir, output_shape, njobs=1):
     def _resize_img(src_image_file):
         img = io.imread(os.path.join(src_dir, src_image_file))
         img_resized = resize(img, output_shape, anti_aliasing=True)
-        io.imsave(os.path.join(dest_dir, src_image_file),
-                  img_resized.astype('uint8'),
-                  check_contrast=False)
+        img_resized = img_resized * 255  # The original resize function returns normalized image.
+        img_resized = img_resized.astype('uint8')
+        io.imsave(os.path.join(dest_dir, src_image_file), img_resized)
 
     start_time = time.time()
     os.makedirs(dest_dir)
@@ -50,7 +51,7 @@ def resize_images_dir(src_dir, dest_dir, output_shape, njobs=1):
 
 resize_images_dir("/datadrive2/dataset/images", "/datadrive2/dataset/images-resized", (224,224) , njobs=16)
 
-resize_images_dir("/datadrive2/dataset/images_test", "/datadrive2/dataset/images_test-resized", (256,256), njobs=16)
+#resize_images_dir("/datadrive2/dataset/images_test", "/datadrive2/dataset/images_test-resized", (224,224), njobs=16)
 
 # Model training
 The basic training code: https://towardsdatascience.com/easy-image-classification-with-tensorflow-2-0-f734fee52d13
