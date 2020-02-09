@@ -24,7 +24,7 @@ starting jupyter: jupyter notebook --no-browser --port=8889 --allow-root &> jupy
 cat jupyter.log
 
 # Docker.
-docker run -itd --gpus all -p 8889:8889 -e USER_HOME=$HOME/vm -v /datadrive:/datadrive --name tf tensorflow/tensorflow:latest-gpu-jupyter bash [Currently running, no need to run this again]
+docker run -itd --gpus all -p 8889:8889 -e USER_HOME=$HOME/vm -v /datadrive:/datadrive --name tf tensorflow/tensorflow:latest-gpu-py3-jupyter bash [Currently running, no need to run this again]
 docker exec -it tf /bin/bash
 cd ../datadrive/camera_trap_animal_classification
 
