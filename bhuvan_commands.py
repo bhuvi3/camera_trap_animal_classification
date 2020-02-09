@@ -3,7 +3,8 @@ Capstone Project Commands
 # VM:
 bhuvanvm: ssh msbhuvan@13.64.190.226
 cpumachine-1: ssh vm@13.93.138.112
-cpumachine-2: ssh vm@104.42.152.252
+cpumachine-2: ssh vm@137.135.50.129
+gpumachine-1: ssh vm@52.175.247.163
 
 # Mounting the disk:
 dmesg | grep SCSI # get <>
@@ -21,6 +22,12 @@ with_ssh_tunnel_for_Jupyter: ssh -N -f -L localhost:8889:localhost:8889 vm@104.4
 stop connection: sudo netstat -lpn |grep :8889 # and kill the shown PID.
 starting jupyter: jupyter notebook --no-browser --port=8889 --allow-root &> jupyter.log
 cat jupyter.log
+
+# Docker.
+docker run -itd --gpus all -p 8889:8889 -e USER_HOME=$HOME/vm -v /datadrive:/datadrive --name tf tensorflow/tensorflow:latest-gpu-jupyter bash [Currently running, no need to run this again]
+docker exec -it tf /bin/bash
+cd ../datadrive/camera_trap_animal_classification
+
 
 # Image Resizing:
 from joblib import Parallel, delayed
@@ -49,43 +56,9 @@ def resize_images_dir(src_dir, dest_dir, output_shape, njobs=1):
     print("Time taken to resize %s images: %s seconds." % (num_images, time_taken))
 
 
-resize_images_dir("/datadrive2/dataset/images", "/datadrive2/dataset/images-resized", (224,224) , njobs=16)
+resize_images_dir("/datadrive2/dataset/images", "/datadrive2/dataset/images-resized-224", (224,224) , njobs=16)
 
-# Resize to 512:
-In [1]: %cpaste
-Pasting code; enter '--' alone on the line to stop or use Ctrl-D.
-:from joblib import Parallel, delayed
-from skimage import io
-from skimage.transform import resize
-import os
-import time
-from tqdm import tqdm
-
-def resize_images_dir(src_dir, dest_dir, output_shape, njobs=1):
-    def _resize_img(src_image_file):
-        img = io.imread(os.path.join(src_dir, src_image_file))
-        img_resized = resize(img, output_shape, anti_aliasing=True)
-        io.imsave(os.path.join(dest_dir, src_image_file),
-                  img_resized.astype('uint8'),
-                  check_contrast=False)
-
-    start_time = time.time()
-    os.makedirs(dest_dir)
-    src_images = os.listdir(src_dir)
-    num_images = len(src_images)
-    print("Total number of images: %s" % num_images)
-    Parallel(n_jobs=njobs)(delay:ed(_resize_img)(src_image_file) for src_image_file in tqdm(src_images))
-    end_time = time.time()
-    time_taken = end_time - start_time
-    print("Time taken to resize %s images: %s seconds." % (num_images, time_taken))
-:::::::::::::::::::::::
-:--
-
-In [2]: resize_images_dir("/datadrive2/dataset/images", "/datadrive2/dataset/images-resized-512", (512,512) , njobs=16)
-Total number of images: 270450
-100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 270450/270450 [8:28:01<00:00,  8.87it/s]
-Time taken to resize 270450 images: 30484.929344415665 seconds.
-
+resize_images_dir("/datadrive2/dataset/images", "/datadrive2/dataset/images-resized", (512,512) , njobs=16)  # TODO Rename to: images-resized-512
 
 #resize_images_dir("/datadrive2/dataset/images_test", "/datadrive2/dataset/images_test-resized", (224,224), njobs=16)
 
