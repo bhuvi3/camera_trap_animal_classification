@@ -24,8 +24,8 @@ starting jupyter: jupyter notebook --no-browser --port=8889 --allow-root &> jupy
 cat jupyter.log
 
 # Docker.
-docker run -itd --gpus all -p 8889:8889 -e USER_HOME=$HOME/vm -v /datadrive:/datadrive --name tf tensorflow/tensorflow:latest-gpu-py3-jupyter bash [Currently running, no need to run this again]
-docker exec -it tf /bin/bash
+docker run -itd --gpus all -p 8889:8889 -e USER_HOME=$HOME/vm -v /datadrive:/datadrive tensorflow/tensorflow:latest-gpu-py3-jupyter bash [Currently running, no need to run this again]
+docker exec -it d6b147aba1f7 /bin/bash  # Get the container_id
 cd ../datadrive/camera_trap_animal_classification
 
 
@@ -70,3 +70,6 @@ tf image summary issues: https://github.com/tensorflow/tensorflow/issues/28868
 # Baseline modeling: mode_flat_all
 # class imbalance:
 {0: 10738, 1: 51426} -> {0:1, 1: 0.21}
+
+### Baseline model training.
+python train_basline_model.py --train-meta-file ../data/final_dataset_train.csv --val-meta-file ../data/final_dataset_val.csv --images-dir ../data/images-resized-224/ --out-dir ../trained_models/baseline_1 --batch-size 64 --epochs 100 --learning-rate 0.001 --image-size 224

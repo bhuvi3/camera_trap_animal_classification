@@ -93,21 +93,24 @@ def train(train_metadata_file_path,
 
     # Prepare the training dataset.
     print("Preparing training and validation datasets.")
-    train_dataset = PipelineGenerator(train_metadata_file_path,
-                                      images_dir_path,
-                                      perform_shuffle=True,
-                                      sequence_image_count=3,
-                                      label_name="has_animal",
-                                      mode="mode_flat_all")
+    train_data_pipeline = PipelineGenerator(train_metadata_file_path,
+                                            images_dir_path,  # XXX: This function calls requires this path to end with slash.
+                                                              # This needs to be handled in the PipelineGenerator.
+                                            perform_shuffle=True,
+                                            sequence_image_count=3,
+                                            label_name="has_animal",
+                                            mode="mode_flat_all")
+    train_dataset = train_data_pipeline.get_pipeline()
     train_dataset = train_dataset.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
 
     # Prepare the validation dataset
-    val_dataset = PipelineGenerator(val_metadata_file_path,
-                                    images_dir_path,
-                                    perform_shuffle=False,
-                                    sequence_image_count=3,
-                                    label_name="has_animal",
-                                    mode="mode_flat_all")
+    val_data_pipeline = PipelineGenerator(val_metadata_file_path,
+                                          images_dir_path,
+                                          perform_shuffle=False,
+                                          sequence_image_count=3,
+                                          label_name="has_animal",
+                                          mode="mode_flat_all")
+    val_dataset = val_data_pipeline.get_pipeline()
     val_dataset = val_dataset.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
 
     # TODO: Find a way to log the activation maps, either during training, or after the training has completed.
