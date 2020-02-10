@@ -63,22 +63,27 @@ class PipelineGenerator(object):
     MODE_FLAT_ALL: Configuration to make the pipeline returns all the images of 
                    the sequence one by one.
     
-    MODE_SINGLE: Configuration to the pipeline return only the selected image 
-                 from the sequence. Choice of image is specified by the 
+    MODE_SINGLE: Configuration to make the pipeline return only the selected 
+                 image from the sequence. Choice of image is specified by the 
                  parameter `image_idx`.
+                 
+    MODE_SEQUENCE: Configuration to make the pipeline return the sequence of 
+                   images as a tensor (array) with a single label.
             
     """
     
     MODE_ALL = "mode_all"
     MODE_FLAT_ALL = "mode_flat_all"
     MODE_SINGLE = "mode_single"
+    MODE_SEQUENCE = "mode_sequence"
     
     
     def __init__(self, dataset_file, images_dir, sequence_image_count=3, 
                  label_name='has_animal', mode=MODE_ALL, image_size=(224, 224), 
                  image_idx=1, resize=None, perform_shuffle=True, 
                  shuffle_buffer_size=10000, **kwargs):
-        self._modes = [self.MODE_ALL, self.MODE_FLAT_ALL, self.MODE_SINGLE]
+        self._modes = [self.MODE_ALL, self.MODE_FLAT_ALL, self.MODE_SINGLE, 
+                       self.MODE_SEQUENCE]
         self._dataset_file = dataset_file
         self._images_dir = images_dir
         self._sequence_image_count = sequence_image_count
@@ -108,6 +113,8 @@ class PipelineGenerator(object):
             self._parse_data = self._parse_data_all
         elif self._mode == self.MODE_FLAT_ALL:
             self._parse_data = self._parse_data_flat
+        elif self._mode == self.MODE_SEQUENCE:
+            self._parse_data = self._parse_data_sequence
         else:
             self._parse_data = self._parse_data_single
             
@@ -233,6 +240,21 @@ class PipelineGenerator(object):
             labels.append(label)
         
         return tf.data.Dataset.from_tensor_slices((images, labels))
+    
+    
+    def _parse_data_sequence(self, metadata, label):
+        images = []
+        seed = np.random.randint(1000)
+        
+        # Read each image and add to list
+        for img_num in range(1, self._sequence_image_count + 1):
+            img = tf.io.read_file(tf.strings.join([
+                self._images_dir, metadata["image" + str(img_num)]]))
+            img = self._decode_img(img)
+            img = self._augment_img(img, seed)
+            images.append(img)
+        
+        return tf.convert_to_tensor(images), label
     
 
     def get_pipeline(self):
