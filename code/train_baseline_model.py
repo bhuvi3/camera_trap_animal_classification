@@ -12,9 +12,49 @@ from data_pipeline import PipelineGenerator
 from models import vgg16
 from tensorflow import keras
 
+import argparse
 import os
 import tensorflow as tf
 import time
+
+
+def get_args():
+    parser = argparse.ArgumentParser(description="Run the the baseline model training.")
+
+    parser.add_argument('--train-meta-file',
+                        required=True,
+                        help="The path to the file containing the training images metadata.")
+    parser.add_argument('--val-meta-file',
+                        required=True,
+                        help="The path to the file containing the validation images metadata.")
+    parser.add_argument('--images-dir',
+                        required=True,
+                        help="The path to the directory containing the images.")
+    parser.add_argument('--out-dir',
+                        required=True,
+                        help="The path to the output dir to which the trained model files need to be written.")
+    parser.add_argument('--batch-size',
+                        type=int,
+                        default=64,
+                        help="The number of datapoints in a training batch. This size must fit within the GPU memory. "
+                             "Default: 64.")
+    parser.add_argument('--epochs',
+                        type=int,
+                        default=100,
+                        help="The number of training epochs. Default: 100.")
+    parser.add_argument('--learning-rate',
+                        type=float,
+                        default=0.001,
+                        help="The constant learning rate to be used for training. Default: 0.001.")
+
+    parser.add_argument('--image-size',
+                        type=int,
+                        default=224,
+                        help="The length of the side for the 'square' images present in the images-dir. Default: 224.")
+
+    args = parser.parse_args()
+
+    return args
 
 
 def train(train_metadata_file_path,
@@ -113,23 +153,17 @@ def train(train_metadata_file_path,
 
 
 if __name__ == "__main__":
-    model_name = "baseline_1"
-    train_metadata_file = "../data/final_dataset_train.csv"
-    val_metadata_file = "../data/final_dataset_val.csv"
-    wellington_images_dir = "../../dataset/images-resized/"  # Ensure the slash at the end.
-    image_size = (224, 224, 3)
-    out_dir = "../models/%s" % model_name
-    class_weight = {0: 1, 1: 0.21}  # The number images found in train metadata file - {0: 10738, 1: 51426}
-    batch_size = 32
-    epochs = 100
-    learning_rate = 0.001
+    args = get_args()
 
-    train(train_metadata_file,
-          val_metadata_file,
-          wellington_images_dir,
-          out_dir,
+    # TODO: Calculate this automatically.
+    class_weight = {0: 1, 1: 0.21}  # The number images found in train metadata file - {0: 10738, 1: 51426}
+
+    train(args.train_meta_file,
+          args.val_meta_file,
+          args.images_dir,
+          args.out_dir,
           class_weight=class_weight,
-          epochs=epochs,
-          batch_size=batch_size,
-          learning_rate=learning_rate,
-          image_size=image_size)
+          epochs=args.epochs,
+          batch_size=args.batch_size,
+          learning_rate=args.learning_rate,
+          image_size=(args.image_size, args.image_size, 3))
