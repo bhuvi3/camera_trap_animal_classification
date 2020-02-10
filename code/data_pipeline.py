@@ -1,18 +1,19 @@
+#!python
 # -*- coding: utf-8 -*-
 
 """
 Contains the code to build the Data Input Pipeline for TensorFlow models.
 
 """
-
+import numpy as np
 import pandas as pd
 import tensorflow as tf
 
 
 class PipelineGenerator(object):
     """
-    Creates a pipeline with the required configuration and image transformations
-    (yet to come). Takes as input a CSV file which lists the images that needs
+    Creates a pipeline with the required configuration and image 
+    transformations. Takes as input a CSV file which lists the images that needs
     to be loaded and transformed.
     
     NOTE: The dataset must have paths of the images in the sequences stored in 
@@ -33,12 +34,16 @@ class PipelineGenerator(object):
           For possible modes and definitions, check the 'Attributes' section. 
           Default is MODE_ALL.
           
+    image_size: Specifies the size of the input images. Must be provided as a 
+                tuple of integers specifying width and height. Default is 
+                (224, 224).
+          
     image_idx: Used when the selected mode is MODE_SINGLE. Specifies the index 
                of the image that needs to be picked. Must be > 0 and 
                <= sequence_image_count. Default is 1.
 
     resize: Specifies the size to which the images must be resized. Default is
-            None. Must be provided as a list of integers specifying width and
+            None. Must be provided as a tuple of integers specifying width and
             height. If None, no resizing is done.
 
     perform_shuffle: Specify if the dataset needs to be shuffled. Default: True.
@@ -70,14 +75,16 @@ class PipelineGenerator(object):
     
     
     def __init__(self, dataset_file, images_dir, sequence_image_count=3, 
-                 label_name='has_animal', mode=MODE_ALL, image_idx=1, 
-                 resize=None, perform_shuffle=True, shuffle_buffer_size=10000, **kwargs):
+                 label_name='has_animal', mode=MODE_ALL, image_size=(224, 224), 
+                 image_idx=1, resize=None, perform_shuffle=True, 
+                 shuffle_buffer_size=10000, **kwargs):
         self._modes = [self.MODE_ALL, self.MODE_FLAT_ALL, self.MODE_SINGLE]
         self._dataset_file = dataset_file
         self._images_dir = images_dir
         self._sequence_image_count = sequence_image_count
         self._label_name = label_name
         self._mode = mode
+        self._image_size = image_size
         self._image_idx = image_idx
         self._resize = resize
         self._perform_shuffle = perform_shuffle
@@ -94,14 +101,84 @@ class PipelineGenerator(object):
              self._image_idx > self._sequence_image_count)):
             raise IndexError("Image index is out of bounds.")
         
+        if self._resize:
+            self._image_size = self._resize
+        
         if self._mode == self.MODE_ALL:
             self._parse_data = self._parse_data_all
         elif self._mode == self.MODE_FLAT_ALL:
             self._parse_data = self._parse_data_flat
         else:
             self._parse_data = self._parse_data_single
+            
 
+    def _augment_img(self, img, seed):
+        
+        def flip(x):
+            """Flip augmentation
 
+            Args:
+                x: Image to flip
+
+            Returns:
+                x: Augmented image
+            """
+            x = tf.image.random_flip_left_right(x, seed=seed)
+            return x
+
+        def color(x):
+            """Color augmentation
+
+            Args:
+                x: Image
+
+            Returns:
+                x: Augmented image
+            """
+            x = tf.image.random_hue(x, 0.08, seed=seed)
+            x = tf.image.random_saturation(x, 0.6, 1.6, seed=seed)
+            x = tf.image.random_brightness(x, 0.05, seed=seed)
+            x = tf.image.random_contrast(x, 0.7, 1.3, seed=seed)
+            return x
+        
+        def zoom(x):
+            """Zoom augmentation
+
+            Args:
+                x: Image
+
+            Returns:
+                x: Augmented image
+            """
+            # Generate 10 crop settings, ranging from a 1% to 10% crop.
+            scales = list(np.arange(0.9, 1.0, 0.02))
+            scale = scales[seed % len(scales)]
+            
+            x1 = y1 = 0.5 - (0.5 * scale)
+            x2 = y2 = 0.5 + (0.5 * scale)
+            boxes = [x1, y1, x2, y2]
+            
+            # Create different crops for an image
+            x = tf.image.crop_and_resize([img], boxes=[boxes], 
+                                         box_indices=[0], 
+                                         crop_size=self._image_size)
+            
+            # Squeeze out the final dimension
+            x = tf.squeeze(x)
+            
+            return x
+        
+        img = flip(img)
+        
+        if seed < 500:
+            img = color(img)
+        
+        if seed >= 250 and seed < 750:
+            img = zoom(img)
+        
+        return tf.clip_by_value(img, 0, 1)
+    
+    
     def _decode_img(self, img):
         # Convert the compressed string to a 3D uint8 tensor
         img = tf.image.decode_jpeg(img, channels=3)
@@ -111,13 +188,14 @@ class PipelineGenerator(object):
 
         # Resize the image to the desired size if needed.
         if self._resize:
-            img = tf.image.resize(img, self._resize, name="resize-input")
+            img = tf.image.resize(img, list(self._resize), name="resize-input")
 
         return img
     
     
     def _parse_data_all(self, metadata, label):
         data_point = {}
+        seed = np.random.randint(1000)
         
         # Read each image and add to dictionary
         for img_num in range(1, self._sequence_image_count + 1):
@@ -125,6 +203,7 @@ class PipelineGenerator(object):
             img = tf.io.read_file(tf.strings.join([
                 self._images_dir, metadata[img_name]]))
             img = self._decode_img(img)
+            img = self._augment_img(img, seed)
             data_point[img_name] = img
 
         return data_point, label
@@ -135,17 +214,21 @@ class PipelineGenerator(object):
                 self._images_dir, metadata["image" + str(self._image_idx)]]))
         img = self._decode_img(img)
         
+        seed = np.random.randint(1000)
+        img = self._augment_img(img, seed)
         return img, label
     
     
     def _parse_data_flat(self, metadata, label):
         images, labels = [], []
+        seed = np.random.randint(1000)
         
         # Read each image and add to list
         for img_num in range(1, self._sequence_image_count + 1):
             img = tf.io.read_file(tf.strings.join([
                 self._images_dir, metadata["image" + str(img_num)]]))
             img = self._decode_img(img)
+            img = self._augment_img(img, seed)
             images.append(img)
             labels.append(label)
         
