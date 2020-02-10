@@ -111,7 +111,7 @@ def train(train_metadata_file_path,
                                           label_name="has_animal",
                                           mode="mode_flat_all")
     val_dataset = val_data_pipeline.get_pipeline()
-    val_dataset = val_dataset.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
+    val_dataset = val_dataset.batch(batch_size).prefetch(3)  # tf.data.experimental.AUTOTUNE
 
     # TODO: Find a way to log the activation maps, either during training, or after the training has completed.
 
@@ -133,7 +133,7 @@ def train(train_metadata_file_path,
 
     # Prepare the callbacks.
     print("Preparing Tensorflow Keras Callbacks.")
-    earlystop_callback = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.001, patience=10)
+    earlystop_callback = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.005, patience=2)
     best_model_checkpoint_callback = keras.callbacks.ModelCheckpoint(filepath=os.path.join(out_dir, "best_model_dir"),
                                                                      mode='max',
                                                                      monitor='val_acc',
