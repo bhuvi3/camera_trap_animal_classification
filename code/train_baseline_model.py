@@ -133,7 +133,7 @@ def train(train_metadata_file_path,
 
     # Prepare the callbacks.
     print("Preparing Tensorflow Keras Callbacks.")
-    earlystop_callback = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.005, patience=2)
+    earlystop_callback = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.005, patience=8)
 
     best_model_checkpoint_acc_callback = keras.callbacks.ModelCheckpoint(filepath=os.path.join(out_dir, "best_model_dir-acc.ckpt"),
                                                                          mode='max',
