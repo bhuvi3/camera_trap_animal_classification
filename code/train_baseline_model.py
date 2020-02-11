@@ -154,11 +154,10 @@ def train(train_metadata_file_path,
     # Start model training.
     print("Starting the model training.")
     start_time = time.time()
-    steps_per_epoch = 1000
+    steps_per_epoch = int(num_training_steps / 4)  # Consider every quarter of the dataset as an epoch.
     print("Setting steps_per_epoch: %s" % steps_per_epoch)
-    model.fit(train_dataset, epochs=int(epochs * (num_training_steps / steps_per_epoch)),
+    model.fit(train_dataset, epochs=int(epochs * 4),  # Essentially, the epoch numbers get multiplied by 4.
               steps_per_epoch=steps_per_epoch,
-              # Only run validation using the first 10 batches of the dataset using the `validation_steps` argument.
               validation_data=val_dataset, validation_steps=num_validation_steps,  # All steps for 1 epoch.
               callbacks=[earlystop_callback, best_model_checkpoint_acc_callback, best_model_checkpoint_loss_callback, tensorboard_callback],
               class_weight=class_weight)
