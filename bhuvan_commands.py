@@ -73,7 +73,9 @@ tf image summary issues: https://github.com/tensorflow/tensorflow/issues/28868
 {0: 10738, 1: 51426} -> {0:1, 1: 0.21}
 
 ### Test baseline training model.
-python train_baseline_model.py --train-meta-file ../data/final_dataset_train.csv --val-meta-file ../data/final_dataset_val.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/trial_1 --batch-size 32 --epochs 2 --learning-rate 0.001 --image-size 224 &> ../logs/trial_1.log &
+python train_baseline_model.py --train-meta-file ../data/final_dataset_train-trial.csv --val-meta-file ../data/final_dataset_val-trial.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline-trial --batch-size 32 --epochs 10 --learning-rate 0.001 --image-size 224 > ../logs/baseline-trial.log 2>&1
 
 ### Baseline model training.
-python train_baseline_model.py --train-meta-file ../data/final_dataset_train.csv --val-meta-file ../data/final_dataset_val.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_1 --batch-size 32 --epochs 10 --learning-rate 0.001 --image-size 224 > ../logs/baseline_1.log 2>&1 [IN PROCESS]
+python train_baseline_model.py --train-meta-file ../data/final_dataset_train.csv --val-meta-file ../data/final_dataset_val.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_1 --batch-size 32 --epochs 10 --learning-rate 0.001 --image-size 224 > ../logs/baseline_1.log 2>&1  & [IN PROCESS]
+
+PID: 1616
