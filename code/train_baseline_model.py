@@ -134,10 +134,19 @@ def train(train_metadata_file_path,
     # Prepare the callbacks.
     print("Preparing Tensorflow Keras Callbacks.")
     earlystop_callback = keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0.005, patience=2)
-    best_model_checkpoint_callback = keras.callbacks.ModelCheckpoint(filepath=os.path.join(out_dir, "best_model_dir"),
-                                                                     mode='max',
-                                                                     monitor='val_acc',
-                                                                     save_best_only=True)
+
+    best_model_checkpoint_acc_callback = keras.callbacks.ModelCheckpoint(filepath=os.path.join(out_dir, "best_model_dir-acc.ckpt"),
+                                                                         mode='max',
+                                                                         monitor='val_accuracy',
+                                                                         save_best_only=True,
+                                                                         verbose=1)
+    best_model_checkpoint_loss_callback = keras.callbacks.ModelCheckpoint(
+        filepath=os.path.join(out_dir, "best_model_dir-loss.ckpt"),
+        mode='min',
+        monitor='val_loss',
+        save_best_only=True,
+        verbose=1)
+
     tensorboard_callback = keras.callbacks.TensorBoard(log_dir=os.path.join(out_dir, "TBGraph"),
                                                        write_graph=True,
                                                        write_images=True)
@@ -145,10 +154,13 @@ def train(train_metadata_file_path,
     # Start model training.
     print("Starting the model training.")
     start_time = time.time()
-    model.fit(train_dataset, epochs=epochs,
+    steps_per_epoch = 1000
+    print("Setting steps_per_epoch: %s" % steps_per_epoch)
+    model.fit(train_dataset, epochs=int(epochs * (num_training_steps / steps_per_epoch)),
+              steps_per_epoch=steps_per_epoch,
               # Only run validation using the first 10 batches of the dataset using the `validation_steps` argument.
               validation_data=val_dataset, validation_steps=num_validation_steps,  # All steps for 1 epoch.
-              callbacks=[earlystop_callback, best_model_checkpoint_callback, tensorboard_callback],
+              callbacks=[earlystop_callback, best_model_checkpoint_acc_callback, best_model_checkpoint_loss_callback, tensorboard_callback],
               class_weight=class_weight)
 
     time_taken = time.time() - start_time
