@@ -172,8 +172,8 @@ def train(train_metadata_file_path,
 
     # Start model training.
     # Defining an 'epoch' to be a quarter of the train dataset.
-    num_train_samples = train_dataset.get_size()
-    num_val_samples = val_dataset.get_size()
+    num_train_samples = train_data_pipeline.get_size()
+    num_val_samples = val_data_pipeline.get_size()
     # Number of batches per one run through the train dataset.
     num_training_steps_per_whole_dataset = int(num_train_samples / batch_size)
     num_val_steps_per_whole_dataset = int(num_val_samples / batch_size)
