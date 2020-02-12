@@ -198,7 +198,7 @@ def train(train_metadata_file_path,
               epochs=max_train_steps,
               steps_per_epoch=steps_per_epoch,
               validation_data=val_dataset,
-              validation_steps=num_training_steps_per_whole_dataset,
+              validation_steps=num_val_steps_per_whole_dataset,
               callbacks=callbacks,
               class_weight=class_weight)
 
