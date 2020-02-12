@@ -180,10 +180,10 @@ def train(train_metadata_file_path,
     steps_per_epoch = int(num_training_steps_per_whole_dataset / train_data_epoch_subdivisions)
     max_train_steps = int(epochs * steps_per_epoch)
 
-    print("Number of train samples: %s, which correspond to  ~ %s batches for one complete run through the "
-          "train dataset. Number of validation samples: %s, which correspond to ~ %s batches for complete iteration. "
+    print("Number of train samples: %s, which correspond to  ~%s batches for one complete run through the "
+          "train dataset. Number of validation samples: %s, which correspond to ~%s batches for complete iteration. "
           "Considering a 1/%s fraction of the train dataset as an epoch (Steps per epoch: %s), "
-          "after which validation and model checkpoints are saved. Running training for a maximum of %s steps."
+          "after which validation and model checkpoints are saved. Running training for a maximum of %s steps. "
           "Early stopping has been set based on '%s' of min_delta of %s with a patience of %s."
           % (num_train_samples, num_training_steps_per_whole_dataset,
              num_val_samples, num_training_steps_per_whole_dataset,
@@ -191,7 +191,7 @@ def train(train_metadata_file_path,
              max_train_steps,
              early_stop_monitor, early_stop_min_delta, early_stop_patience))
 
-    print("Starting the model training.")
+    print("\nStarting the model training.")
     start_time = time.time()
 
     model.fit(train_dataset,
