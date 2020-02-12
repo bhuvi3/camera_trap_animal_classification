@@ -14,7 +14,6 @@ from tensorflow import keras
 
 import argparse
 import os
-import tensorflow as tf
 import time
 
 
@@ -103,7 +102,7 @@ def train(train_metadata_file_path,
     train_data_epoch_subdivisions = 4
     early_stop_monitor = "val_loss"
     early_stop_min_delta = 0.005
-    early_stop_patience = 1 * train_data_epoch_subdivisions  # One run through the train dataset.
+    early_stop_patience = 2 * train_data_epoch_subdivisions  # One run through the train dataset.
     prefetch_buffer_size = 3  # Can be also be set to tf.data.experimental.AUTOTUNE
 
     os.makedirs(out_dir)
