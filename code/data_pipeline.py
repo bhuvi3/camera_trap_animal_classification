@@ -280,25 +280,21 @@ class PipelineGenerator(object):
         if self._mode == self.MODE_FLAT_ALL:
             self._size = self._size * self._sequence_image_count
 
-        image_col_names = ["image" + str(img_num) \
-                           for img_num in range(1, self._sequence_image_count + 1)]
+        image_col_names = ["image" + str(img_num) for img_num in range(1, self._sequence_image_count + 1)]
         file_paths = data_csv[image_col_names]
         labels = data_csv[[self._label_name]]
         dataset_files = tf.data.Dataset.from_tensor_slices((file_paths.to_dict('list'), labels.values.reshape(-1, )))
 
+        # Parse the data and load the images.
+        if self._mode == self.MODE_FLAT_ALL:
+            dataset_images = dataset_files.flat_map(self._parse_data)
+        else:
+            dataset_images = dataset_files.map(self._parse_data, num_parallel_calls=self._AUTOTUNE)
+
         if self._is_training:
-            dataset_files = dataset_files.shuffle(buffer_size=self._shuffle_buffer_size, reshuffle_each_iteration=True)
-            dataset_files = dataset_files.repeat()
+            dataset_images = dataset_images.shuffle(buffer_size=self._shuffle_buffer_size, reshuffle_each_iteration=True)
+            dataset_images = dataset_images.repeat()
             print("Note: The dataset is being prepared for training mode. "
                   "It has been shuffled, and repeated indefinitely.")
 
-        # Parse the data and load the images.
-        if self._mode == self.MODE_FLAT_ALL:
-            dataset_images = \
-                dataset_files.flat_map(self._parse_data)
-        else:
-            dataset_images = \
-                dataset_files.map(self._parse_data, 
-                                  num_parallel_calls=self._AUTOTUNE)
-        
         return dataset_images
