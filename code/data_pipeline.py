@@ -78,9 +78,9 @@ class PipelineGenerator(object):
     MODE_SEQUENCE = "mode_sequence"
     
     
-    def __init__(self, dataset_file, images_dir, sequence_image_count=3, 
-                 label_name='has_animal', mode=MODE_ALL, image_size=(224, 224), 
-                 image_idx=1, resize=None, perform_shuffle=True, 
+    def __init__(self, dataset_file, images_dir, sequence_image_count=3,
+                 label_name='has_animal', mode=MODE_ALL, image_size=(224, 224),
+                 image_idx=1, resize=None, is_training=True,
                  shuffle_buffer_size=10000, **kwargs):
         self._modes = [self.MODE_ALL, self.MODE_FLAT_ALL, self.MODE_SINGLE, 
                        self.MODE_SEQUENCE]
@@ -92,11 +92,12 @@ class PipelineGenerator(object):
         self._image_size = image_size
         self._image_idx = image_idx
         self._resize = resize
-        self._perform_shuffle = perform_shuffle
+        self._is_training = is_training
         self._shuffle_buffer_size = shuffle_buffer_size
         self._kwargs = kwargs
         self._AUTOTUNE = tf.data.experimental.AUTOTUNE
-        
+        self._size = None
+
         if self._mode not in self._modes:
             raise ValueError("Invalid mode. Please select one from {}."\
                              .format(self._modes))
@@ -117,7 +118,6 @@ class PipelineGenerator(object):
             self._parse_data = self._parse_data_sequence
         else:
             self._parse_data = self._parse_data_single
-            
 
     def _augment_img(self, img, seed):
         
@@ -224,8 +224,8 @@ class PipelineGenerator(object):
         seed = np.random.randint(1000)
         img = self._augment_img(img, seed)
         return img, label
-    
-    
+
+
     def _parse_data_flat(self, metadata, label):
         images, labels = [], []
         seed = np.random.randint(1000)
@@ -255,7 +255,13 @@ class PipelineGenerator(object):
             images.append(img)
         
         return tf.convert_to_tensor(images), label
-    
+
+
+    def get_size(self):
+        if self._size is None:
+            print("Size cannot be determined before the 'get_pipeline' function call. Returning None.")
+        return self._size
+
 
     def get_pipeline(self):
         """
@@ -268,15 +274,24 @@ class PipelineGenerator(object):
         """
         # Create a dataset with records from the CSV file.
         data_csv = pd.read_csv(self._dataset_file)
+
+        # Set the size attribute.
+        self._size = len(data_csv)
+        if self._mode == self.MODE_FLAT_ALL:
+            self._size = self._size * self._sequence_image_count
+
         image_col_names = ["image" + str(img_num) \
                            for img_num in range(1, self._sequence_image_count + 1)]
         file_paths = data_csv[image_col_names]
         labels = data_csv[[self._label_name]]
         dataset_files = tf.data.Dataset.from_tensor_slices((file_paths.to_dict('list'), labels.values.reshape(-1, )))
 
-        if self._perform_shuffle:
+        if self._is_training:
             dataset_files = dataset_files.shuffle(buffer_size=self._shuffle_buffer_size, reshuffle_each_iteration=True)
-        
+            dataset_files = dataset_files.repeat()
+            print("Note: The dataset is being prepared for training mode. "
+                  "It has been shuffled, and repeated indefinitely.")
+
         # Parse the data and load the images.
         if self._mode == self.MODE_FLAT_ALL:
             dataset_images = \
