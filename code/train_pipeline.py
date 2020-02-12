@@ -185,7 +185,7 @@ def train(train_metadata_file_path,
           "after which validation and model checkpoints are saved. Running training for a maximum of %s steps. "
           "Early stopping has been set based on '%s' of min_delta of %s with a patience of %s."
           % (num_train_samples, num_training_steps_per_whole_dataset,
-             num_val_samples, num_training_steps_per_whole_dataset,
+             num_val_samples, num_val_steps_per_whole_dataset,
              train_data_epoch_subdivisions, steps_per_epoch,
              max_train_steps,
              early_stop_monitor, early_stop_min_delta, early_stop_patience))
