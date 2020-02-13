@@ -93,7 +93,7 @@ def vgg16_pretrained_imagenet(input_shape, is_training=False, num_classes=1, lea
     inputs = keras.Input(shape=input_shape, name='input')
 
     model_vgg16_conv = keras.applications.vgg16.VGG16(weights='imagenet', include_top=False)
-    output_vgg16_conv = model_vgg16_conv(input)
+    output_vgg16_conv = model_vgg16_conv(inputs)
 
     flatten = layers.Flatten(name="flatten")(output_vgg16_conv)
     fc1 = _add_dense_block(4096, flatten, is_training, "fc1")
