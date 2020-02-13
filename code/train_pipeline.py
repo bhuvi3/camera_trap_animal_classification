@@ -72,7 +72,7 @@ def train(train_metadata_file_path,
           sequence_image_count=1,
           data_pipeline_mode="mode_flat_all",
           class_weight=None,
-          epochs=100,
+          whole_epochs=100,
           batch_size=32,
           learning_rate=0.001,
           input_size=(224, 224, 3)):
@@ -90,7 +90,7 @@ def train(train_metadata_file_path,
     :param data_pipeline_mode: The mode of the data pipeline. Default: "mode_flat_all".
     :param class_weight: The class_weights for imbalanced data. Example: {0: 1.0, 1: 0.5}, if class "0" is twice less
         represented than class "1" in your data. Default: None.
-    :param epochs: The maximum number of epochs to be trained. Note that the model maybe early-stopped. Default: 100.
+    :param whole_epochs: The maximum number of epochs to be trained. Note that the model maybe early-stopped. Default: 100.
     :param batch_size: The batch size used for the data. Ensure that it fits within the GPU memory. Default: 32.
     :param learning_rate: The constant learning rate to be used for the Adam optimizer. Default: 0.001.
     :param input_size: The shape of the tensors returned by the data pipeline mode. Default: (224, 224, 3).
@@ -177,25 +177,27 @@ def train(train_metadata_file_path,
     num_training_steps_per_whole_dataset = int(num_train_samples / batch_size)
     num_val_steps_per_whole_dataset = int(num_val_samples / batch_size)
     steps_per_epoch = int(num_training_steps_per_whole_dataset / train_data_epoch_subdivisions)
-    max_num_sub_epochs = epochs * train_data_epoch_subdivisions
-    max_train_steps = int(max_num_sub_epochs * steps_per_epoch)
+    max_num_epochs = int(whole_epochs * train_data_epoch_subdivisions)
+    max_train_steps = int(max_num_epochs * steps_per_epoch)
 
     print("Number of train samples: %s, which correspond to  ~%s batches for one complete run through the "
           "train dataset. Number of validation samples: %s, which correspond to ~%s batches for complete iteration. "
-          "Considering a 1/%s fraction of the train dataset as an epoch (steps_per_epoch: %s, max_num_sub_epochs: %s) "
-          "after which validation and model checkpoints are saved. Running training for a maximum of %s steps. "
+          "Considering a 1/%s fraction of the train dataset as an epoch (steps_per_epoch: %s) "
+          "after which validation and model checkpoints are saved. Running training for a maximum of %s steps, "
+          "which correspond to max_num_epochs: %s (whole_epochs: %s)."
           "Early stopping has been set based on '%s' of min_delta of %s with a patience of %s."
           % (num_train_samples, num_training_steps_per_whole_dataset,
              num_val_samples, num_val_steps_per_whole_dataset,
-             train_data_epoch_subdivisions, steps_per_epoch, max_num_sub_epochs,
+             train_data_epoch_subdivisions, steps_per_epoch,
              max_train_steps,
+             max_num_epochs, whole_epochs,
              early_stop_monitor, early_stop_min_delta, early_stop_patience))
 
     print("\nStarting the model training.")
     start_time = time.time()
 
     model.fit(train_dataset,
-              epochs=max_num_sub_epochs,
+              epochs=max_num_epochs,
               steps_per_epoch=steps_per_epoch,
               validation_data=val_dataset,
               validation_steps=num_val_steps_per_whole_dataset,
@@ -230,7 +232,7 @@ if __name__ == "__main__":
           sequence_image_count=sequence_image_count,
           data_pipeline_mode=args.data_pipeline_mode,
           class_weight=class_weight,
-          epochs=args.epochs,
+          whole_epochs=args.epochs,
           batch_size=args.batch_size,
           learning_rate=args.learning_rate,
           input_size=input_size)
