@@ -32,6 +32,9 @@ docker exec -it b619db070bb6 /bin/bash  # Get the container_id: b619db070bb6, us
 cd ../datadrive/camera_trap_animal_classification
 
 
+docker exec -it 3734e31aa5a6 /bin/bash  # gpumachine-2
+
+
 # Image Resizing:
 from joblib import Parallel, delayed
 from skimage import io
