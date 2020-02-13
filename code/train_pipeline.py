@@ -184,7 +184,7 @@ def train(train_metadata_file_path,
           "train dataset. Number of validation samples: %s, which correspond to ~%s batches for complete iteration. "
           "Considering a 1/%s fraction of the train dataset as an epoch (steps_per_epoch: %s) "
           "after which validation and model checkpoints are saved. Running training for a maximum of %s steps, "
-          "which correspond to max_num_epochs: %s (whole_epochs: %s)."
+          "which correspond to max_num_epochs: %s (whole_epochs: %s). "
           "Early stopping has been set based on '%s' of min_delta of %s with a patience of %s."
           % (num_train_samples, num_training_steps_per_whole_dataset,
              num_val_samples, num_val_steps_per_whole_dataset,
