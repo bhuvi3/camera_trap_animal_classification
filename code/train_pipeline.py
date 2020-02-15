@@ -217,7 +217,7 @@ if __name__ == "__main__":
     class_weight = {0: 1, 1: 0.21}  # The number images found in train metadata file - {0: 10738, 1: 51426}
     sequence_image_count = 3
 
-    if args.data_pipeline_mode == "MODE_SEQUENCE":
+    if args.data_pipeline_mode == "mode_sequence":
         input_size = (sequence_image_count, args.image_size, args.image_size, 3)
     else:
         input_size = (args.image_size, args.image_size, 3)
