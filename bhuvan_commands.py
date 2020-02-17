@@ -5,7 +5,7 @@ bhuvanvm: ssh msbhuvan@13.64.190.226
 cpumachine-1: ssh vm@13.93.138.112
 cpumachine-2: ssh vm@137.135.50.129
 
-gpumachine-1: ssh vm@52.175.247.163
+gpumachine-1: ssh vm@13.77.137.115
 gpumachine-2: ssh vm@52.151.28.86
 
 # Mounting the disk:
@@ -26,10 +26,10 @@ starting jupyter: jupyter notebook --no-browser --port=8889 --allow-root &> jupy
 cat jupyter.log
 
 # Docker.
-docker pull tensorflow/tensorflow:2.0.0-gpu-py3-jupyter [one time]
-docker run -itd --gpus all -p 8889:8889 -e USER_HOME=$HOME/vm -v /datadrive:/datadrive tensorflow/tensorflow:2.0.0-gpu-py3-jupyter bash
-docker exec -it b619db070bb6 /bin/bash  # Get the container_id: b619db070bb6, using docker ps.
-cd ../datadrive/camera_trap_animal_classification
+docker pull tensorflow/tensorflow:latest-gpu-py3-jupyter [one time] # tensorflow/tensorflow:2.0.0-gpu-py3-jupyter
+docker run -itd --gpus all -p 8889:8889 -e USER_HOME=$HOME/vm -v /datadrive:/datadrive tensorflow/tensorflow:latest-gpu-py3-jupyter bash
+docker exec -it 3e979ce67035 /bin/bash  # Get the container_id: b619db070bb6, using docker ps.
+cd ../datadrive/camera_trap_animal_classification/code
 
 
 docker exec -it 3734e31aa5a6 /bin/bash  # gpumachine-2
@@ -84,11 +84,15 @@ python train_pipeline.py --train-meta-file ../data/final_dataset_train-trial.csv
 
 python train_pipeline.py --train-meta-file ../data/final_dataset_train-trial.csv --val-meta-file ../data/final_dataset_val-trial.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline-trial-2 --model-arch vgg16_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 2 --learning-rate 0.001 --image-size 224
 
+python train_pipeline.py --train-meta-file ../data/final_dataset_train-trial.csv --val-meta-file ../data/final_dataset_val-trial.csv --images-dir ../../wellington_data/images-resized-512/ --out-dir ../trained_models/baseline-trial-3 --model-arch vgg16_batchnorm --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 2 --learning-rate 0.001 --image-size 512
+
 ### Baseline model training.
-python train_baseline_model.py --train-meta-file ../data/final_dataset_train.csv --val-meta-file ../data/final_dataset_val.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_1 --batch-size 32 --epochs 10 --learning-rate 0.001 --image-size 224 > ../logs/baseline_1.log 2>&1  & [INCOMPLETE]
+python train_baseline_model.py --train-meta-file ../data/final_dataset_train.csv --val-meta-file ../data/final_dataset_val.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_1 --batch-size 32 --epochs 10 --learning-rate 0.001 --image-size 224 > ../logs/baseline_1.log 2>&1 & [INCOMPLETE]
 
-python train_baseline_model.py --train-meta-file ../data/final_dataset_train.csv --val-meta-file ../data/final_dataset_val.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_2 --batch-size 32 --epochs 10 --learning-rate 0.001 --image-size 224 > ../logs/baseline_2.log 2>&1  & [INCOMPLETE]
+python train_baseline_model.py --train-meta-file ../data/final_dataset_train.csv --val-meta-file ../data/final_dataset_val.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_2 --batch-size 32 --epochs 10 --learning-rate 0.001 --image-size 224 > ../logs/baseline_2.log 2>&1 & [INCOMPLETE]
 
-python train_pipeline.py --train-meta-file ../data/final_dataset_train.csv --val-meta-file ../data/final_dataset_val.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_3 --model-arch vgg16_batchnorm --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 10 --learning-rate 0.001 --image-size 224 > ../logs/baseline_3.log 2>&1  & [PID: 95]
+python train_pipeline.py --train-meta-file ../data/final_dataset_train.csv --val-meta-file ../data/final_dataset_val.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_3 --model-arch vgg16_batchnorm --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 10 --learning-rate 0.001 --image-size 224 > ../logs/baseline_3.log 2>&1 & [gpumachine-1, COMPLETED]
 
-python train_pipeline.py --train-meta-file ../data/final_dataset_train.csv --val-meta-file ../data/final_dataset_val.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_4 --model-arch vgg16_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 10 --learning-rate 0.001 --image-size 224 > ../logs/baseline_4.log 2>&1  & [PID: 3688]
+python train_pipeline.py --train-meta-file ../data/final_dataset_train.csv --val-meta-file ../data/final_dataset_val.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_4 --model-arch vgg16_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 10 --learning-rate 0.001 --image-size 224 > ../logs/baseline_4.log 2>&1 & [gpumachine-2, COMPLETED]
+
+python train_pipeline.py --train-meta-file ../data/final_dataset_train.csv --val-meta-file ../data/final_dataset_val.csv --images-dir ../../wellington_data/images-resized-512/ --out-dir ../trained_models/baseline_5 --model-arch vgg16_batchnorm --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 10 --learning-rate 0.001 --image-size 512 > ../logs/baseline_5.log 2>&1 & [gpumachine-1, TODO]
