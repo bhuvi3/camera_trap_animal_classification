@@ -97,7 +97,7 @@ class InputOutputSaver:
         self.output = output
 
 
-def get_layer_outputs(model, required_layers, input_batch):
+def get_layer_outputs(model, required_layers, input_tensors):
     """
     Extract the outputs of intermediate layers provided in required_layers from the model,
     after running the input_batch through the model.
@@ -129,7 +129,7 @@ def get_layer_outputs(model, required_layers, input_batch):
         layer.register_hook(saver)
         savers[layer_name] = saver
 
-    model_outputs = model(input_batch)
+    model_outputs = model(input_tensors)
     savers["output"] = model_outputs
     return savers
 
@@ -304,7 +304,11 @@ def inference_pipeline(test_metadata_file_path,
     if extract_layers:
         print("\nExtracting the outputs at intermediate layers.")
         savers_outpath = os.path.join(out_dir, "extracted_layer_outputs_dict.pickle")
-        savers = get_layer_outputs(model, extract_layers, test_batch)
+        if is_sequence_model:
+            savers = get_layer_outputs(model, extract_layers, test_sequences)
+        else:
+            # Consider the first image for individual image models.
+            savers = get_layer_outputs(model, extract_layers, test_sequences[:, 0, :, :])
         with open(savers_outpath, "wb") as fp:
             pickle.dump(savers, fp)
         print("The outputs at these model layers - %s - from the last batch have been saved to: %s"
