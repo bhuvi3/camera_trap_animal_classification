@@ -65,6 +65,8 @@ def get_args():
 
     if not args.extract_layers:
         args.extract_layers = []
+    else:
+        args.extract_layers = args.extract_layers.split(",")
 
     return args
 
