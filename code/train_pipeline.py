@@ -213,8 +213,6 @@ if __name__ == "__main__":
 
     num_classes = 1
     label_name = "has_animal"
-    # TODO: Calculate this automatically probably in the data pipeline, and set it as a property.
-    class_weight = {0: 1, 1: 0.21}  # The number images found in train metadata file - {0: 10738, 1: 51426}
     sequence_image_count = 3
 
     if args.data_pipeline_mode == "mode_sequence":
@@ -231,7 +229,7 @@ if __name__ == "__main__":
           label_name=label_name,
           sequence_image_count=sequence_image_count,
           data_pipeline_mode=args.data_pipeline_mode,
-          class_weight=class_weight,
+          class_weight=None,
           whole_epochs=args.epochs,
           batch_size=args.batch_size,
           learning_rate=args.learning_rate,
