@@ -174,9 +174,13 @@ class PipelineGenerator(object):
             x = tf.squeeze(x)
             
             return x
-        
+
+        # Augment images only in training mode.
+        if not self._is_training:
+            return img
+
         img = flip(img)
-        
+
         if seed < 500:
             img = color(img)
         
