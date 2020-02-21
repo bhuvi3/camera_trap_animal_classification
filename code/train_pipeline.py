@@ -51,6 +51,10 @@ def get_args():
                         type=float,
                         default=0.001,
                         help="The constant learning rate to be used for training. Default: 0.001.")
+    parser.add_argument('--patience',
+                        type=int,
+                        default=2,
+                        help="The number of epochs (full train dataset) to wait before early stopping. Default: 2.")
 
     parser.add_argument('--image-size',
                         type=int,
@@ -75,6 +79,7 @@ def train(train_metadata_file_path,
           whole_epochs=100,
           batch_size=32,
           learning_rate=0.001,
+          patience=2,
           input_size=(224, 224, 3)):
     """
     Train a VGG16 model based on single image.
@@ -93,6 +98,7 @@ def train(train_metadata_file_path,
     :param whole_epochs: The maximum number of epochs to be trained. Note that the model maybe early-stopped. Default: 100.
     :param batch_size: The batch size used for the data. Ensure that it fits within the GPU memory. Default: 32.
     :param learning_rate: The constant learning rate to be used for the Adam optimizer. Default: 0.001.
+    :param patience: The number of epochs (full train dataset) to wait before early stopping. Default: 2.
     :param input_size: The shape of the tensors returned by the data pipeline mode. Default: (224, 224, 3).
 
     """
@@ -100,9 +106,9 @@ def train(train_metadata_file_path,
         raise ValueError("Since num_classes equals 1, the label_name must be provided.")
 
     train_data_epoch_subdivisions = 4
-    early_stop_monitor = "val_loss"
-    early_stop_min_delta = 0.005
-    early_stop_patience = 2 * train_data_epoch_subdivisions  # One run through the train dataset.
+    early_stop_monitor = "val_accuracy"
+    early_stop_min_delta = 0.01
+    early_stop_patience = patience * train_data_epoch_subdivisions  # One run through the train dataset.
     prefetch_buffer_size = 3  # Can be also be set to tf.data.experimental.AUTOTUNE
 
     os.makedirs(out_dir)
@@ -233,4 +239,5 @@ if __name__ == "__main__":
           whole_epochs=args.epochs,
           batch_size=args.batch_size,
           learning_rate=args.learning_rate,
+          patience=args.patience,
           input_size=input_size)
