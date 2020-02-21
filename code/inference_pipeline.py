@@ -323,8 +323,8 @@ if __name__ == "__main__":
     else:
         input_size = (args.image_size, args.image_size, 3)
 
-    inference_pipeline(args.test_metadata_file_path,
-                       args.images_dir_path,
+    inference_pipeline(args.test_meta_file,
+                       args.images_dir,
                        args.out_dir,
                        args.trained_model_arch,
                        args.trained_checkpoint_dir,
