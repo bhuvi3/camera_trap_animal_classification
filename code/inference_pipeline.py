@@ -10,6 +10,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from data_pipeline import PipelineGenerator
 from models import ModelFactory
+from sklearn.metrics import roc_curve, auc
 from typing import List, Callable, Optional
 
 import argparse
@@ -18,7 +19,6 @@ import numpy as np
 import os
 import pickle
 import shutil
-import sklearn
 import tensorflow as tf
 import time
 
@@ -158,8 +158,8 @@ def evaluate(pred_labels, evaluation_dir):
     y_test = [x[1] for x in pred_labels]
 
     # Compute ROC score.
-    fpr, tpr, _ = sklearn.metrics.roc_curve(y_test, y_score)
-    roc_auc = sklearn.metrics.auc(fpr, tpr)
+    fpr, tpr, _ = roc_curve(y_test, y_score)
+    roc_auc = auc(fpr, tpr)
 
     plt.figure()
     plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
