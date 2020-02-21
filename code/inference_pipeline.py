@@ -213,9 +213,8 @@ def inference_pipeline(test_metadata_file_path,
     :param extract_layers: The names of the model layers (as a comma separated values) to be extracted.
 
     """
-    def _get_preds_labels(model, test_batch):
-        test_images, test_labels = test_batch
-        preds = model.predict(test_images)
+    def _get_preds_labels(model, test_input_tensors, test_labels):
+        preds = model.predict(test_input_tensors)
         preds_labels = list(zip(preds[:, 0], test_labels.numpy()))
         return preds_labels
 
@@ -228,6 +227,7 @@ def inference_pipeline(test_metadata_file_path,
             all_labels.append([x[1] for x in cur_pred_labels])
 
             # Ensure all labels match.
+            # TODO: This step is redundant, it can be removed.
             if i > 0:
                 assert np.allclose(all_labels[0], all_labels[i])
 
@@ -264,13 +264,14 @@ def inference_pipeline(test_metadata_file_path,
     pred_labels = [[]] * sequence_image_count
 
     for test_batch in test_dataset_batches:
+        test_sequences, test_labels = test_batch
         if is_sequence_model:
-            cur_pred_labels = _get_preds_labels(model, test_batch)
+            cur_pred_labels = _get_preds_labels(model, test_sequences, test_labels)
             pred_labels.extend(cur_pred_labels)
         else:
             for i in range(sequence_image_count):
-                cur_single_image_test_batch = test_batch[:, i, :, :, :]
-                cur_single_image_pred_labels = _get_preds_labels(model, cur_single_image_test_batch)
+                cur_single_image_test_images = test_sequences[:, i, :, :, :]
+                cur_single_image_pred_labels = _get_preds_labels(model, cur_single_image_test_images, test_labels)
                 pred_labels[i].extend(cur_single_image_pred_labels)
 
     end_time = time.time()
