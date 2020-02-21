@@ -285,7 +285,7 @@ def inference_pipeline(test_metadata_file_path,
     else:
         pred_label_output_path = os.path.join(out_dir, "pred_labels-individual.pickle")
     with open(pred_label_output_path, "wb") as fp:
-        pickle.dump(pred_labels, pred_label_output_path)
+        pickle.dump(pred_labels, fp)
     print("Model inference has completed, and the pred_labels have been saved to: %s", pred_label_output_path)
 
     # Run evaluations.
