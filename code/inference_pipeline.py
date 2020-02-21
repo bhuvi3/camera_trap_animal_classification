@@ -302,6 +302,7 @@ def inference_pipeline(test_metadata_file_path,
 
     # Save the layer outputs for the extract_layers to a pickle file.
     if extract_layers:
+        print("\nExtracting the outputs at intermediate layers.")
         savers_outpath = os.path.join(out_dir, "extracted_layer_outputs_dict.pickle")
         savers = get_layer_outputs(model, extract_layers, test_batch)
         with open(savers_outpath, "wb") as fp:
