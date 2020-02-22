@@ -106,7 +106,7 @@ def train(train_metadata_file_path,
         raise ValueError("Since num_classes equals 1, the label_name must be provided.")
 
     train_data_epoch_subdivisions = 4
-    early_stop_monitor = "auc"
+    early_stop_monitor = "val_auc"
     early_stop_min_delta = 0.01
     early_stop_patience = patience * train_data_epoch_subdivisions  # One run through the train dataset.
     prefetch_buffer_size = 3  # Can be also be set to tf.data.experimental.AUTOTUNE
@@ -155,7 +155,7 @@ def train(train_metadata_file_path,
 
     best_model_checkpoint_auc_callback = keras.callbacks.ModelCheckpoint(filepath=os.path.join(out_dir, "best_model_dir-auc.ckpt"),
                                                                          mode='max',
-                                                                         monitor='auc',
+                                                                         monitor='val_auc',
                                                                          save_best_only=True,
                                                                          save_weights_only=False,
                                                                          verbose=1)
