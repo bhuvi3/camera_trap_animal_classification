@@ -171,14 +171,16 @@ def evaluate(pred_labels, evaluation_dir):
     plt.title('ROC for Positive Class')
     plt.legend(loc="lower right")
     plt.savefig(os.path.join(evaluation_dir, "roc.png"))
+    plt.clf()
 
     # Compute score distribution.
     plt.style.use('ggplot')
-    plt.hist(y_score, bins=100)
+    plt.hist(y_score, bins=100, color="blue")
     plt.title("Score Distribution")
     plt.xlabel('Predicted Probability')
     plt.ylabel('Frequency')
     plt.savefig(os.path.join(evaluation_dir, "score_distribution.png"))
+    plt.clf()
 
     print("Evaluation results have been written to: %s" % evaluation_dir)
 
