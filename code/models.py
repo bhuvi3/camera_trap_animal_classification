@@ -38,6 +38,7 @@ def _add_dense_block(units, inputs, is_training, name_prefix, kernel_regularizer
     dropout = layers.Dropout(dropout_rate, name="%s-Dropout_%s" % (name_prefix, dropout_rate))(relu, training=is_training)
     return dropout
 
+
 def cnn_lstm(input_shape, is_training=True, num_classes=1, learning_rate=0.001):
     """
     Builds a vgg16 model with Batchnorm and Dropout layers.
@@ -144,7 +145,9 @@ def cnn_lstm(input_shape, is_training=True, num_classes=1, learning_rate=0.001):
     loss = tf.keras.losses.BinaryCrossentropy()
 
     model = keras.Model(inputs=inputs, outputs=predictions, name="LSTM-CNN")
-    model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate), loss=loss, metrics=['accuracy'])
+    model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),
+                  loss=loss,
+                  metrics=['accuracy', keras.metrics.AUC(curve='ROC')])
 
     return model
 
@@ -197,7 +200,9 @@ def vgg16_batchnorm(input_shape, is_training=False, num_classes=1, learning_rate
         loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
 
     model = keras.Model(inputs=inputs, outputs=predictions, name="vgg16_batchnorm")
-    model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate), loss=loss, metrics=['accuracy'])
+    model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),
+                  loss=loss,
+                  metrics=['accuracy', keras.metrics.AUC(curve='ROC')])
 
     return model
 
@@ -208,6 +213,7 @@ def vgg16_pretrained_imagenet(input_shape, is_training=False, num_classes=1, lea
     model_vgg16_conv = keras.applications.vgg16.VGG16(weights='imagenet', include_top=False)
     output_vgg16_conv = model_vgg16_conv(inputs)
 
+    # The training argument doesn't effect due to no Batchnorm and Dropout.
     flatten = layers.Flatten(name="flatten")(output_vgg16_conv)
     fc1 = _add_dense_block(4096, flatten, is_training, "fc1")
     fc2 = _add_dense_block(4096, fc1, is_training, "fc2")
@@ -220,7 +226,55 @@ def vgg16_pretrained_imagenet(input_shape, is_training=False, num_classes=1, lea
         loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
 
     model = keras.Model(inputs=inputs, outputs=predictions, name="vgg16_pretrained_imagenet")
-    model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate), loss=loss, metrics=['accuracy'])
+    model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),
+                  loss=loss,
+                  metrics=['accuracy', keras.metrics.AUC(curve='ROC')])
+
+    return model
+
+
+def resnet50_pretrained_imagenet(input_shape, is_training=False, num_classes=1, learning_rate=0.001):
+    inputs = keras.Input(shape=input_shape, name='input')
+
+    model_pretrained_conv = tf.keras.applications.resnet50.ResNet50(weights='imagenet', include_top=False)
+    output_pretrained_conv = model_pretrained_conv(inputs, training=is_training)
+
+    avg_pool = layers.GlobalAveragePooling2D(name="avg_pool")(output_pretrained_conv)
+
+    if num_classes <= 2:
+        predictions = layers.Dense(1, activation="sigmoid", name="predictions")(avg_pool)
+        loss = tf.keras.losses.BinaryCrossentropy()
+    else:
+        predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(avg_pool)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
+
+    model = keras.Model(inputs=inputs, outputs=predictions, name="resnet50_pretrained_imagenet")
+    model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),
+                  loss=loss,
+                  metrics=['accuracy', keras.metrics.AUC(curve='ROC')])
+
+    return model
+
+
+def inceptionresnetv2_pretrained_imagenet(input_shape, is_training=False, num_classes=1, learning_rate=0.001):
+    inputs = keras.Input(shape=input_shape, name='input')
+
+    model_pretrained_conv = tf.keras.applications.inception_resnet_v2.InceptionResNetV2(weights='imagenet', include_top=False)
+    output_pretrained_conv = model_pretrained_conv(inputs, training=is_training)
+
+    avg_pool = layers.GlobalAveragePooling2D(name="avg_pool")(output_pretrained_conv)
+
+    if num_classes <= 2:
+        predictions = layers.Dense(1, activation="sigmoid", name="predictions")(avg_pool)
+        loss = tf.keras.losses.BinaryCrossentropy()
+    else:
+        predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(avg_pool)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
+
+    model = keras.Model(inputs=inputs, outputs=predictions, name="inceptionresnetv2_pretrained_imagenet")
+    model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),
+                  loss=loss,
+                  metrics=['accuracy', keras.metrics.AUC(curve='ROC')])
 
     return model
 
@@ -228,8 +282,14 @@ def vgg16_pretrained_imagenet(input_shape, is_training=False, num_classes=1, lea
 # The dictionary mapping model names to model architecture functions.
 # Ensure that the name of the model architecture matches with the model's 'name' attribute.
 AVAILABLE_MODEL_ARCHS = {
+    # Single-image models.
     "vgg16_batchnorm": vgg16_batchnorm,
+    # Single-image models with pre-trained weights.
     "vgg16_pretrained_imagenet": vgg16_pretrained_imagenet,
+    "resnet50_pretrained_imagenet": resnet50_pretrained_imagenet,
+    "inceptionresnetv2_pretrained_imagenet": inceptionresnetv2_pretrained_imagenet,
+
+    # Sequence-based models.
     "cnn_lstm": cnn_lstm	
 }
 

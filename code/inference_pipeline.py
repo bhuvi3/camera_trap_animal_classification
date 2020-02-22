@@ -129,7 +129,7 @@ def get_layer_outputs(model, required_layers, input_tensors):
         layer.register_hook(saver)
         savers[layer_name] = saver
 
-    model_outputs = model(input_tensors)
+    model_outputs = model(input_tensors, training=False)
     savers["output"] = model_outputs
     return savers
 
