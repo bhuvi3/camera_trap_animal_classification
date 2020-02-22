@@ -9,15 +9,25 @@ gpumachine-1: ssh vm@13.77.137.115
 gpumachine-2: ssh vm@52.151.28.86
 
 # Mounting the disk:
-dmesg | grep SCSI # get <>
-sudo mkdir /datadrive2
-sudo mount /dev/<> /datadrive2
+dmesg | grep SCSI
 
-sudo -i blkid # get <>
+sudo fdisk /dev/<>
+n
+p
+q
+
+sudo mkdir /datadrive
+sudo mount /dev/<>1 /datadrive
+
+sudo -i blkid
 sudo vi /etc/fstab
-    UUID=7b3f9aae-77f2-471e-aa34-b93fd5c66afd   /datadrive2   ext4   defaults,nofail   1   2
+    UUID=<>   /datadrive   ext4   defaults,nofail   1   2
 
-save and restart (sudo reboot)
+sudo reboot
+
+ssh-keygen -t rsa -b 4096 -C "msbhuvanbhuvi@gmail.com"
+cat .ssh/id_rsa.pub
+
 
 # Connecting to Jupyter
 with_ssh_tunnel_for_Jupyter: ssh -N -f -L localhost:8889:localhost:8889 vm@104.42.152.252
@@ -84,7 +94,9 @@ python train_pipeline.py --train-meta-file ../data/final_dataset_train-trial.csv
 
 python train_pipeline.py --train-meta-file ../data/final_dataset_train-trial.csv --val-meta-file ../data/final_dataset_val-trial.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline-trial-2 --model-arch vgg16_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 2 --learning-rate 0.001 --image-size 224
 
-python train_pipeline.py --train-meta-file ../data/final_dataset_train-trial.csv --val-meta-file ../data/final_dataset_val-trial.csv --images-dir ../../wellington_data/images-resized-512/ --out-dir ../trained_models/baseline-trial-3 --model-arch vgg16_batchnorm --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 2 --learning-rate 0.001 --image-size 512
+python train_pipeline.py --train-meta-file ../data/final_dataset_train-trial.csv --val-meta-file ../data/final_dataset_val-trial.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline-trial-4 --model-arch resnet50_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 64 --epochs 1 --learning-rate 0.001 --image-size 224
+
+python train_pipeline.py --train-meta-file ../data/final_dataset_train-trial.csv --val-meta-file ../data/final_dataset_val-trial.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline-trial-5 --model-arch inceptionresnetv2_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 64 --epochs 1 --learning-rate 0.001 --image-size 224
 
 ### Baseline model training.
 python train_baseline_model.py --train-meta-file ../data/final_dataset_train.csv --val-meta-file ../data/final_dataset_val.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_1 --batch-size 32 --epochs 10 --learning-rate 0.001 --image-size 224 > ../logs/baseline_1.log 2>&1 & [INCOMPLETE]
@@ -97,7 +109,15 @@ python train_pipeline.py --train-meta-file ../data/final_dataset_train.csv --val
 
 python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_3_balanced --model-arch vgg16_batchnorm --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 10 --learning-rate 0.001 --image-size 224 > ../logs/baseline_3_balanced.log 2>&1 & [gpumachine-2, COMPLETED]
 
+#--------
 python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_4_balanced --model-arch vgg16_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 10 --learning-rate 0.0001 --image-size 224 > ../logs/baseline_4_balanced.log 2>&1 & [gpumachine-2, IN PROCESS (124)]
+
+python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_5_balanced --model-arch resnet50_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 64 --epochs 10 --learning-rate 0.0001 --image-size 224 > ../logs/baseline_5_balanced.log 2>&1 & [gpumachine-3, IN PROCESS (38)]
+
+python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_6_balanced --model-arch inceptionresnetv2_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 64 --epochs 10 --learning-rate 0.0001 --image-size 224 > ../logs/baseline_6_balanced.log 2>&1 & [gpumachine-4, IN PROCESS (37)]
+
+#--------
+
 
 # Running inference pipeline. (specify --is-sequence-model flag for sequence models.)
 # Model: baseline_3
