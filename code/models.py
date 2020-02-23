@@ -170,7 +170,7 @@ def resnet50_pretrained_imagenet_lstm(input_shape, is_training=False, num_classe
     model_pretrained_conv = tf.keras.applications.resnet50.ResNet50(weights='imagenet', include_top=False)
     model_pretrained_conv_time_dist = TimeDistributed(model_pretrained_conv)(inputs, training=is_training)
 
-    flattened = layers.Reshape(target_shape=(input_shape[0], 2048))(model_pretrained_conv_time_dist)
+    flattened = layers.Flatten(name='flatten')(model_pretrained_conv_time_dist)
 
     lstm_layer = LSTM(128, time_major=False)(flattened, training=is_training)
 
