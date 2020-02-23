@@ -164,7 +164,7 @@ def inceptionresnetv2_pretrained_imagenet(input_shape, is_training=False, num_cl
     return model
 
 
-def resnet50_pretrained_imagenet_lstm(input_shape, is_training=False, num_classes=1, learning_rate=0.001):
+def resnet50_pretrained_imagenet_lstm(input_shape, is_training=True, num_classes=1, learning_rate=0.001):
     inputs = keras.Input(shape=input_shape, name='input')
 
     model_pretrained_conv = tf.keras.applications.resnet50.ResNet50(weights='imagenet', include_top=False)
