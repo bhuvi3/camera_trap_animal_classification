@@ -10,7 +10,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from data_pipeline import PipelineGenerator
 from models import ModelFactory
-from sklearn.metrics import roc_curve, auc
+from scipy import stats
+from sklearn.metrics import roc_curve, auc, accuracy_score, precision_score, recall_score, f1_score
 from typing import List, Callable, Optional
 
 import argparse
@@ -149,17 +150,18 @@ def load_and_get_model_for_inference(trained_model_arch, trained_checkpoint_dir,
     return model
 
 
-def evaluate(pred_labels, evaluation_dir):
+def evaluate(y_pred, evaluation_dir):
     """Get evaluation metrics on the given pred_labels list.
     """
     print("Currently only ROC is supported. AP over recall range of 90:100 would be included!")
     os.makedirs(evaluation_dir)
-    y_score = [x[0] for x in pred_labels]
-    y_test = [x[1] for x in pred_labels]
+    y_score = [x[0] for x in y_pred]
+    y_test = [x[1] for x in y_pred]
 
     # Compute ROC score.
     fpr, tpr, _ = roc_curve(y_test, y_score)
     roc_auc = auc(fpr, tpr)
+    print("The ROC AUC is: %.2f" % roc_auc)
 
     plt.figure()
     plt.plot(fpr, tpr, color='darkorange', lw=2, label='ROC curve (area = %0.2f)' % roc_auc)
@@ -174,6 +176,8 @@ def evaluate(pred_labels, evaluation_dir):
     plt.clf()
 
     # Compute score distribution.
+    score_stats = stats.describe(y_score)
+    print("Predicted Probabilities Distribution: %s" % str(score_stats))
     plt.style.use('ggplot')
     plt.hist(y_score, bins=100, color="blue")
     plt.title("Score Distribution")
@@ -181,6 +185,18 @@ def evaluate(pred_labels, evaluation_dir):
     plt.ylabel('Frequency')
     plt.savefig(os.path.join(evaluation_dir, "score_distribution.png"))
     plt.clf()
+
+    # Applying mean as threshold and providing other useful metrics.
+    thresh = score_stats.mean
+    print("Applying threshold (mean): %s (Please check the ROC curve and apply appropriate threshold)" % thresh)
+    y_pred = y_score >= thresh  # APplying threshold to get predictions.
+    prediction_metrics = {
+        "accuracy": accuracy_score(y_test, y_pred),
+        "preciion": precision_score(y_test, y_pred),
+        "recall": recall_score(y_test, y_pred),
+        "f1-score": f1_score(y_test, y_pred)
+    }
+    print("Other Performance Metrics (after applying mean as threshold): \n%s" % prediction_metrics)
 
     print("Evaluation results have been written to: %s" % evaluation_dir)
 
