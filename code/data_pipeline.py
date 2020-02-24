@@ -119,6 +119,7 @@ class PipelineGenerator(object):
         else:
             self._parse_data = self._parse_data_single
 
+
     def _augment_img(self, img, seed):
         
         def flip(x):
