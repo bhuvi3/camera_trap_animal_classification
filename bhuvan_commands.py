@@ -138,19 +138,19 @@ python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balance
 # Model: baseline_3_balanced
 python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_3_balanced/val_acc --batch-size 32 --trained-model-arch vgg16_batchnorm --trained-checkpoint-dir ../trained_models/baseline_3_balanced/best_model_dir-acc.ckpt --image-size 224 > ../logs/inference-baseline_3_balanced-val_acc.log 2>&1 &
 
-python compute_majority_vote_roc.py --preds-labels-file ../inference_outputs/baseline_3_balanced/val_acc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_3_balanced/val_acc/evaluation/individual-roc.png
+python compute_roc.py --preds-labels-file ../inference_outputs/baseline_3_balanced/val_acc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_3_balanced/val_acc/evaluation/individual-roc.png
 
 # Model: baseline_4_balanced
 python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_4_balanced/val_acc --batch-size 32 --trained-model-arch vgg16_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_4_balanced/best_model_dir-acc.ckpt --image-size 224 > ../logs/inference-baseline_4_balanced-val_acc.log 2>&1 &
 
-python compute_majority_vote_roc.py --preds-labels-file ../inference_outputs/baseline_4_balanced/val_acc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_4_balanced/val_acc/evaluation/individual-roc.png
+python compute_roc.py --preds-labels-file ../inference_outputs/baseline_4_balanced/val_acc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_4_balanced/val_acc/evaluation/individual-roc.png
 
 # Model: baseline_5_balanced
 python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_5_balanced/val_auc --batch-size 32 --trained-model-arch resnet50_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_5_balanced/best_model_dir-auc.ckpt --image-size 224 > ../logs/inference-baseline_5_balanced-val_auc.log 2>&1 &
 
-python compute_majority_vote_roc.py --preds-labels-file ../inference_outputs/baseline_5_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_5_balanced/val_auc/evaluation/individual-roc.png
+python compute_roc.py --preds-labels-file ../inference_outputs/baseline_5_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_5_balanced/val_auc/evaluation/individual-roc.png
 
 # Model: baseline_6_balanced
 python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_6_balanced/val_auc --batch-size 32 --trained-model-arch inceptionresnetv2_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_6_balanced/best_model_dir-auc.ckpt --image-size 224 > ../logs/inference-baseline_6_balanced-val_auc.log 2>&1 &
 
-python compute_majority_vote_roc.py --preds-labels-file ../inference_outputs/baseline_6_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_6_balanced/val_auc/evaluation/individual-roc.png
+python compute_roc.py --preds-labels-file ../inference_outputs/baseline_6_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_6_balanced/val_auc/evaluation/individual-roc.png
