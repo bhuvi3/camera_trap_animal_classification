@@ -51,6 +51,10 @@ def get_args():
                         type=float,
                         default=0.001,
                         help="The constant learning rate to be used for training. Default: 0.001.")
+    parser.add_argument('--patience',
+                        type=int,
+                        default=2,
+                        help="The number of epochs (full train dataset) to wait before early stopping. Default: 2.")
 
     parser.add_argument('--image-size',
                         type=int,
@@ -75,6 +79,7 @@ def train(train_metadata_file_path,
           whole_epochs=100,
           batch_size=32,
           learning_rate=0.001,
+          patience=2,
           input_size=(224, 224, 3)):
     """
     Train a VGG16 model based on single image.
@@ -93,6 +98,7 @@ def train(train_metadata_file_path,
     :param whole_epochs: The maximum number of epochs to be trained. Note that the model maybe early-stopped. Default: 100.
     :param batch_size: The batch size used for the data. Ensure that it fits within the GPU memory. Default: 32.
     :param learning_rate: The constant learning rate to be used for the Adam optimizer. Default: 0.001.
+    :param patience: The number of epochs (full train dataset) to wait before early stopping. Default: 2.
     :param input_size: The shape of the tensors returned by the data pipeline mode. Default: (224, 224, 3).
 
     """
@@ -100,9 +106,9 @@ def train(train_metadata_file_path,
         raise ValueError("Since num_classes equals 1, the label_name must be provided.")
 
     train_data_epoch_subdivisions = 4
-    early_stop_monitor = "val_loss"
-    early_stop_min_delta = 0.005
-    early_stop_patience = 2 * train_data_epoch_subdivisions  # One run through the train dataset.
+    early_stop_monitor = "val_auc"
+    early_stop_min_delta = 0.01
+    early_stop_patience = patience * train_data_epoch_subdivisions  # One run through the train dataset.
     prefetch_buffer_size = 3  # Can be also be set to tf.data.experimental.AUTOTUNE
 
     os.makedirs(out_dir)
@@ -147,9 +153,9 @@ def train(train_metadata_file_path,
                                                        min_delta=early_stop_min_delta,
                                                        patience=early_stop_patience)
 
-    best_model_checkpoint_acc_callback = keras.callbacks.ModelCheckpoint(filepath=os.path.join(out_dir, "best_model_dir-acc.ckpt"),
+    best_model_checkpoint_auc_callback = keras.callbacks.ModelCheckpoint(filepath=os.path.join(out_dir, "best_model_dir-auc.ckpt"),
                                                                          mode='max',
-                                                                         monitor='val_accuracy',
+                                                                         monitor='val_auc',
                                                                          save_best_only=True,
                                                                          save_weights_only=False,
                                                                          verbose=1)
@@ -165,7 +171,7 @@ def train(train_metadata_file_path,
                                                        write_images=True)
 
     callbacks = [earlystop_callback,
-                 best_model_checkpoint_acc_callback,
+                 best_model_checkpoint_auc_callback,
                  best_model_checkpoint_loss_callback,
                  tensorboard_callback]
 
@@ -213,8 +219,6 @@ if __name__ == "__main__":
 
     num_classes = 1
     label_name = "has_animal"
-    # TODO: Calculate this automatically probably in the data pipeline, and set it as a property.
-    class_weight = {0: 1, 1: 0.21}  # The number images found in train metadata file - {0: 10738, 1: 51426}
     sequence_image_count = 3
 
     if args.data_pipeline_mode == "mode_sequence":
@@ -231,8 +235,9 @@ if __name__ == "__main__":
           label_name=label_name,
           sequence_image_count=sequence_image_count,
           data_pipeline_mode=args.data_pipeline_mode,
-          class_weight=class_weight,
+          class_weight=None,
           whole_epochs=args.epochs,
           batch_size=args.batch_size,
           learning_rate=args.learning_rate,
+          patience=args.patience,
           input_size=input_size)
