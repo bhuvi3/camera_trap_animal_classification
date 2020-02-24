@@ -28,7 +28,7 @@ SEQUENCE_LENGTH = 3
 
 
 def get_args():
-    parser = argparse.ArgumentParser(description="Run the the baseline model training.")
+    parser = argparse.ArgumentParser(description="Run model inference and  evaluation on the given test set.")
 
     parser.add_argument('--test-meta-file',
                         required=True,
