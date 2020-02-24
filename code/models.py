@@ -156,7 +156,7 @@ def resnet101_pretrained_imagenet(input_shape, is_training=False, num_classes=1,
         predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(avg_pool)
         loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
 
-    model = keras.Model(inputs=inputs, outputs=predictions, name="resnet50_pretrained_imagenet")
+    model = keras.Model(inputs=inputs, outputs=predictions, name="resnet101_pretrained_imagenet")
     model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),
                   loss=loss,
                   metrics=['accuracy', keras.metrics.AUC(curve='ROC')])
@@ -179,7 +179,7 @@ def resnet152_pretrained_imagenet(input_shape, is_training=False, num_classes=1,
         predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(avg_pool)
         loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
 
-    model = keras.Model(inputs=inputs, outputs=predictions, name="resnet50_pretrained_imagenet")
+    model = keras.Model(inputs=inputs, outputs=predictions, name="resnet152_pretrained_imagenet")
     model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),
                   loss=loss,
                   metrics=['accuracy', keras.metrics.AUC(curve='ROC')])
