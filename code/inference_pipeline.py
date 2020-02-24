@@ -263,7 +263,10 @@ def inference_pipeline(test_metadata_file_path,
     # Else, this list would contain, 'sequence_image_count' (say 3) lists of (pred, label) tuples.
     print("\nRunning model inference.")
     start_time = time.time()
-    pred_labels = [[]] * sequence_image_count
+    if is_sequence_model:
+        pred_labels = []
+    else:
+        pred_labels = [[]] * sequence_image_count
 
     for test_batch in test_dataset_batches:
         test_sequences, test_labels = test_batch
