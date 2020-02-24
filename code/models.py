@@ -141,6 +141,52 @@ def resnet50_pretrained_imagenet(input_shape, is_training=False, num_classes=1, 
     return model
 
 
+def resnet101_pretrained_imagenet(input_shape, is_training=False, num_classes=1, learning_rate=0.001):
+    inputs = keras.Input(shape=input_shape, name='input')
+
+    model_pretrained_conv = tf.keras.applications.ResNet101(weights='imagenet', include_top=False)
+    output_pretrained_conv = model_pretrained_conv(inputs, training=is_training)
+
+    avg_pool = layers.GlobalAveragePooling2D(name="avg_pool")(output_pretrained_conv)
+
+    if num_classes <= 2:
+        predictions = layers.Dense(1, activation="sigmoid", name="predictions")(avg_pool)
+        loss = tf.keras.losses.BinaryCrossentropy()
+    else:
+        predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(avg_pool)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
+
+    model = keras.Model(inputs=inputs, outputs=predictions, name="resnet50_pretrained_imagenet")
+    model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),
+                  loss=loss,
+                  metrics=['accuracy', keras.metrics.AUC(curve='ROC')])
+
+    return model
+
+
+def resnet152_pretrained_imagenet(input_shape, is_training=False, num_classes=1, learning_rate=0.001):
+    inputs = keras.Input(shape=input_shape, name='input')
+
+    model_pretrained_conv = tf.keras.applications.ResNet152(weights='imagenet', include_top=False)
+    output_pretrained_conv = model_pretrained_conv(inputs, training=is_training)
+
+    avg_pool = layers.GlobalAveragePooling2D(name="avg_pool")(output_pretrained_conv)
+
+    if num_classes <= 2:
+        predictions = layers.Dense(1, activation="sigmoid", name="predictions")(avg_pool)
+        loss = tf.keras.losses.BinaryCrossentropy()
+    else:
+        predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(avg_pool)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
+
+    model = keras.Model(inputs=inputs, outputs=predictions, name="resnet50_pretrained_imagenet")
+    model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),
+                  loss=loss,
+                  metrics=['accuracy', keras.metrics.AUC(curve='ROC')])
+
+    return model
+
+
 def inceptionresnetv2_pretrained_imagenet(input_shape, is_training=False, num_classes=1, learning_rate=0.001):
     inputs = keras.Input(shape=input_shape, name='input')
 
@@ -197,6 +243,8 @@ AVAILABLE_MODEL_ARCHS = {
     # Single-image models with pre-trained weights.
     "vgg16_pretrained_imagenet": vgg16_pretrained_imagenet,
     "resnet50_pretrained_imagenet": resnet50_pretrained_imagenet,
+    "resnet101_pretrained_imagenet": resnet101_pretrained_imagenet,
+    "resnet152_pretrained_imagenet": resnet152_pretrained_imagenet,
     "inceptionresnetv2_pretrained_imagenet": inceptionresnetv2_pretrained_imagenet,
 
     # Sequence-based models.
