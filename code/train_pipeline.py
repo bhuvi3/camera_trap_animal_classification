@@ -153,13 +153,20 @@ def train(train_metadata_file_path,
                                                        min_delta=early_stop_min_delta,
                                                        patience=early_stop_patience)
 
-    best_model_checkpoint_auc_callback = keras.callbacks.ModelCheckpoint(filepath=os.path.join(out_dir, "best_model_dir-auc.ckpt"),
+
+    #We use the HDF5 method to store the sequence models due to a bug in tensorflow TimeDistributed wrapper
+    if data_pipeline_mode == 'mode_sequence':
+        model_extension = ".h5"
+    else:
+        model_extension = ".ckpt"
+
+    best_model_checkpoint_auc_callback = keras.callbacks.ModelCheckpoint(filepath=os.path.join(out_dir, "best_model_dir-auc"+model_extension),
                                                                          mode='max',
                                                                          monitor='val_auc',
                                                                          save_best_only=True,
                                                                          save_weights_only=False,
                                                                          verbose=1)
-    best_model_checkpoint_loss_callback = keras.callbacks.ModelCheckpoint(filepath=os.path.join(out_dir, "best_model_dir-loss.ckpt"),
+    best_model_checkpoint_loss_callback = keras.callbacks.ModelCheckpoint(filepath=os.path.join(out_dir, "best_model_dir-loss"+model_extension),
                                                                           mode='min',
                                                                           monitor='val_loss',
                                                                           save_best_only=True,
