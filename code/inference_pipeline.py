@@ -53,6 +53,9 @@ def get_args():
     parser.add_argument('--trained-checkpoint-dir',
                         required=True,
                         help="The name of the model checkpoint directory created using train pipeline.")
+    parser.add_argument('--filetype',
+                        required=True,
+                        help="The type of extension used to used to save the model")
     parser.add_argument('--extract-layers',
                         default=None,
                         help="The names of the model layers (as a comma separated values) to be extracted. "
