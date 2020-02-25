@@ -1,3 +1,4 @@
 code/.ipynb_checkpoints
 *.pyc
 data/images
+.vscode/
