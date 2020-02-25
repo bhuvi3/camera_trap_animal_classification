@@ -299,7 +299,9 @@ AVAILABLE_MODEL_ARCHS = {
     "inceptionresnetv2_pretrained_imagenet": inceptionresnetv2_pretrained_imagenet,
 
     # Sequence-based models.
-    "resnet50_pretrained_imagenet_lstm": resnet50_pretrained_imagenet_lstm	
+    "resnet50_pretrained_imagenet_lstm": resnet50_pretrained_imagenet_lstm,
+    "resnet50_pretrained_imagenet_lstm_avg_pool": resnet50_pretrained_imagenet_lstm_avg_pool,
+    "resnet152_pretrained_imagenet_lstm_avg_pool": resnet152_pretrained_imagenet_lstm_avg_pool
 }
 
 
