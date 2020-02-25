@@ -13,6 +13,8 @@ from tensorflow.keras.layers import LSTM, TimeDistributed
 
 import tensorflow as tf
 
+import os
+
 
 def _add_conv_block(num_filters, inputs, is_training, name_prefix, kernel_regularizer=None):
     """Adds a Batchnorm enabled convolution block.
@@ -157,6 +159,36 @@ def resnet101_pretrained_imagenet(input_shape, is_training=False, num_classes=1,
         loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
 
     model = keras.Model(inputs=inputs, outputs=predictions, name="resnet101_pretrained_imagenet")
+    model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),
+                  loss=loss,
+                  metrics=['accuracy', keras.metrics.AUC(curve='ROC')])
+
+    return model
+
+
+def resnet152_mask_pretrained_imagenet(input_shape, is_training=False, 
+                                       num_classes=1, learning_rate=0.001):
+    
+    weights_file = os.path.join(os.getcwd(), 'data')
+    # Check if the weights file is present
+    
+    
+    
+    inputs = keras.Input(shape=input_shape, name='input')
+
+    model_pretrained_conv = tf.keras.applications.ResNet152(weights='imagenet', include_top=False)
+    output_pretrained_conv = model_pretrained_conv(inputs, training=is_training)
+
+    avg_pool = layers.GlobalAveragePooling2D(name="avg_pool")(output_pretrained_conv)
+
+    if num_classes <= 2:
+        predictions = layers.Dense(1, activation="sigmoid", name="predictions")(avg_pool)
+        loss = tf.keras.losses.BinaryCrossentropy()
+    else:
+        predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(avg_pool)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
+
+    model = keras.Model(inputs=inputs, outputs=predictions, name="resnet152_pretrained_imagenet")
     model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),
                   loss=loss,
                   metrics=['accuracy', keras.metrics.AUC(curve='ROC')])
