@@ -263,7 +263,7 @@ def resnet152_pretrained_imagenet_lstm_avg_pool(input_shape, is_training=False, 
 
     inputs = keras.Input(shape=input_shape, name='input')
 
-    model_pretrained_conv = tf.keras.applications.resnet50.ResNet152(weights='imagenet', include_top=False)
+    model_pretrained_conv = tf.keras.applications.ResNet152(weights='imagenet', include_top=False)
     model_pretrained_conv_time_dist = TimeDistributed(model_pretrained_conv)(inputs, training=is_training)
 
     avg_pool = TimeDistributed(layers.GlobalAveragePooling2D(name="avg_pool"))(model_pretrained_conv_time_dist)
