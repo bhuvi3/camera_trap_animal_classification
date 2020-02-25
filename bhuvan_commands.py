@@ -154,3 +154,13 @@ python compute_roc.py --preds-labels-file ../inference_outputs/baseline_5_balanc
 python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_6_balanced/val_auc --batch-size 32 --trained-model-arch inceptionresnetv2_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_6_balanced/best_model_dir-auc.ckpt --image-size 224 > ../logs/inference-baseline_6_balanced-val_auc.log 2>&1 &
 
 python compute_roc.py --preds-labels-file ../inference_outputs/baseline_6_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_6_balanced/val_auc/evaluation/individual-roc.png
+
+# Model: baseline_7_balanced
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_7_balanced/val_auc --batch-size 32 --trained-model-arch resnet101_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_7_balanced/best_model_dir-auc.ckpt --image-size 224 > ../logs/inference-baseline_7_balanced-val_auc.log 2>&1 &
+
+python compute_roc.py --preds-labels-file ../inference_outputs/baseline_7_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_7_balanced/val_auc/evaluation/individual-roc
+
+# Model: baseline_8_balanced
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_8_balanced/val_auc --batch-size 32 --trained-model-arch resnet152_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_8_balanced/best_model_dir-auc.ckpt --image-size 224 > ../logs/inference-baseline_8_balanced-val_auc.log 2>&1 &
+
+python compute_roc.py --preds-labels-file ../inference_outputs/baseline_8_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_8_balanced/val_auc/evaluation/individual-roc
