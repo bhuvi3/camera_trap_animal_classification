@@ -10,21 +10,29 @@ dependencies:
   - backcall=0.1.0=py37_0
   - blas=1.0=mkl
   - bleach=3.1.0=py_0
+  - bzip2=1.0.8=h1de35cc_0
   - c-ares=1.15.0=h1de35cc_1001
-  - ca-certificates=2019.11.27=0
+  - ca-certificates=2020.1.1=0
+  - cairo=1.14.12=hc4e6be7_4
   - certifi=2019.11.28=py37_0
+  - cycler=0.10.0=py37_0
   - dbus=1.13.12=h90a0687_0
   - decorator=4.4.1=py_0
   - defusedxml=0.6.0=py_0
   - entrypoints=0.3=py37_0
   - expat=2.2.6=h0a44026_0
+  - ffmpeg=4.0=h01ea3c9_0
+  - fontconfig=2.13.0=h5d5b041_1
+  - freetype=2.9.1=hb4e5f40_0
   - gast=0.2.2=py37_0
   - gettext=0.19.8.1=h15daf44_3
   - glib=2.63.1=hd977a24_0
   - google-pasta=0.1.8=py_0
+  - graphite2=1.3.13=h2098e52_0
   - grpcio=1.16.1=py37h044775b_1
-  - h5py=2.9.0=py37h3134771_0
-  - hdf5=1.10.4=hfa1e0ec_0
+  - h5py=2.8.0=py37h878fce3_3
+  - harfbuzz=1.8.8=hb8d4a28_0
+  - hdf5=1.10.2=hfa1e0ec_1
   - icu=58.2=h4b95b61_1
   - importlib_metadata=1.3.0=py37_0
   - intel-openmp=2019.4=233
@@ -32,8 +40,10 @@ dependencies:
   - ipython=7.11.1=py37h39e3cac_0
   - ipython_genutils=0.2.0=py37_0
   - ipywidgets=7.5.1=py_0
+  - jasper=2.0.14=h636a363_1
   - jedi=0.15.2=py37_0
   - jinja2=2.10.3=py_0
+  - joblib=0.14.1=py_0
   - jpeg=9b=he5867d9_2
   - jsonschema=3.2.0=py37_0
   - jupyter=1.0.0=py37_7
@@ -42,17 +52,24 @@ dependencies:
   - jupyter_core=4.6.1=py37_0
   - keras-applications=1.0.8=py_0
   - keras-preprocessing=1.1.0=py_1
+  - kiwisolver=1.1.0=py37h0a44026_0
   - libcxx=4.0.1=hcfea43d_1
   - libcxxabi=4.0.1=hcfea43d_1
   - libedit=3.1.20181209=hb402a30_0
   - libffi=3.2.1=h475c297_4
   - libgfortran=3.0.1=h93005f0_2
   - libiconv=1.15=hdd342a3_7
+  - libopencv=3.4.2=h7c891bd_1
+  - libopus=1.3=h1de35cc_0
   - libpng=1.6.37=ha441bb4_0
   - libprotobuf=3.11.2=hd9629dc_0
   - libsodium=1.0.16=h3efe00b_0
+  - libtiff=4.1.0=hcb84e12_0
+  - libvpx=1.7.0=h378b8a2_0
+  - libxml2=2.9.9=hf6e021a_1
   - markdown=3.1.1=py37_0
   - markupsafe=1.1.1=py37h1de35cc_0
+  - matplotlib=3.1.1=py37h54f8f79_0
   - mistune=0.8.4=py37h1de35cc_0
   - mkl=2019.4=233
   - mkl-service=2.3.0=py37hfbe908c_0
@@ -65,7 +82,9 @@ dependencies:
   - notebook=6.0.2=py37_0
   - numpy=1.18.1=py37h7241aed_0
   - numpy-base=1.18.1=py37h6575580_1
-  - openssl=1.1.1d=h1de35cc_3
+  - olefile=0.46=py_0
+  - opencv=3.4.2=py37h6fd60c2_1
+  - openssl=1.1.1d=h1de35cc_4
   - opt_einsum=3.1.0=py_0
   - pandas=0.25.3=py37h0a44026_0
   - pandoc=2.2.3.2=0
@@ -74,12 +93,16 @@ dependencies:
   - pcre=8.43=h0a44026_0
   - pexpect=4.7.0=py37_0
   - pickleshare=0.7.5=py37_0
+  - pillow=7.0.0=py37h4655f20_0
   - pip=19.3.1=py37_0
+  - pixman=0.38.0=h1de35cc_0
   - prometheus_client=0.7.1=py_0
   - prompt_toolkit=3.0.2=py_0
   - protobuf=3.11.2=py37h0a44026_0
   - ptyprocess=0.6.0=py37_0
+  - py-opencv=3.4.2=py37h7c891bd_1
   - pygments=2.5.2=py_0
+  - pyparsing=2.4.6=py_0
   - pyqt=5.9.2=py37h655552a_2
   - pyrsistent=0.15.6=py37h1de35cc_0
   - python=3.7.6=h359304d_2
@@ -90,6 +113,7 @@ dependencies:
   - qtconsole=4.6.0=py_1
   - readline=7.0=h1de35cc_5
   - scipy=1.3.1=py37h1410ff5_0
+  - seaborn=0.10.0=py_0
   - send2trash=1.5.0=py37_0
   - setuptools=44.0.0=py37_0
   - sip=4.19.8=py37h0a44026_0
@@ -115,6 +139,7 @@ dependencies:
   - zeromq=4.3.1=h0a44026_3
   - zipp=0.6.0=py_0
   - zlib=1.2.11=h1de35cc_3
+  - zstd=1.3.7=h5bba6e5_0
   - pip:
     - cachetools==4.0.0
     - chardet==3.0.4
