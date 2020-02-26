@@ -70,7 +70,8 @@ class PipelineGenerator(object):
     MODE_SEQUENCE: Configuration to make the pipeline return the sequence of 
                    images as a tensor (array) with a single label.
                    
-    MODE_MASK_MOG2: 
+    MODE_MASK_MOG2_SINGLE: Configuration similar to MODE_SINGLE except the image
+                           has an additional mask channel.
             
     """
     
@@ -78,6 +79,7 @@ class PipelineGenerator(object):
     MODE_FLAT_ALL = "mode_flat_all"
     MODE_SINGLE = "mode_single"
     MODE_SEQUENCE = "mode_sequence"
+    MODE_MASK_MOG2_SINGLE = "mode_mask_mog2_single"
     
     
     def __init__(self, dataset_file, images_dir, sequence_image_count=3,
@@ -85,7 +87,7 @@ class PipelineGenerator(object):
                  image_idx=1, resize=None, is_training=True,
                  shuffle_buffer_size=10000, **kwargs):
         self._modes = [self.MODE_ALL, self.MODE_FLAT_ALL, self.MODE_SINGLE, 
-                       self.MODE_SEQUENCE]
+                       self.MODE_SEQUENCE, self.MODE_MASK_MOG2_SINGLE]
         self._dataset_file = dataset_file
         self._images_dir = images_dir
         self._sequence_image_count = sequence_image_count
@@ -104,7 +106,7 @@ class PipelineGenerator(object):
             raise ValueError("Invalid mode. Please select one from {}."\
                              .format(self._modes))
         
-        if (self._mode == self.MODE_SINGLE and 
+        if (self._mode in [self.MODE_SINGLE, self.MODE_MASK_MOG2_SINGLE] and 
             (self._image_idx <= 0 or 
              self._image_idx > self._sequence_image_count)):
             raise IndexError("Image index is out of bounds.")
@@ -118,11 +120,13 @@ class PipelineGenerator(object):
             self._parse_data = self._parse_data_flat
         elif self._mode == self.MODE_SEQUENCE:
             self._parse_data = self._parse_data_sequence
+        elif self._mode == self.MODE_MASK_MOG2_SINGLE:
+            self._parse_data = self._parse_data_mask_mog2_single
         else:
             self._parse_data = self._parse_data_single
 
 
-    def _augment_img(self, img, seed):
+    def _augment_img(self, img, seed, is_mask=False):
         
         def flip(x):
             """Flip augmentation
@@ -184,7 +188,7 @@ class PipelineGenerator(object):
 
         img = flip(img)
 
-        if seed < 500:
+        if seed < 500 and not is_mask:
             img = color(img)
         
         if seed >= 250 and seed < 750:
@@ -193,9 +197,12 @@ class PipelineGenerator(object):
         return tf.clip_by_value(img, 0, 1)
     
     
-    def _decode_img(self, img):
-        # Convert the compressed string to a 3D uint8 tensor
-        img = tf.image.decode_jpeg(img, channels=3)
+    def _decode_img(self, img, is_mask=False):
+        # Convert the compressed string to a uint8 tensor
+        if is_mask:
+            img = tf.image.decode_image(img, channels=1)
+        else:    
+            img = tf.image.decode_image(img, channels=3)
 
         # Use `convert_image_dtype` to convert to floats in the [0,1] range.
         img = tf.image.convert_image_dtype(img, tf.float32)
@@ -231,6 +238,28 @@ class PipelineGenerator(object):
         seed = np.random.randint(1000)
         img = self._augment_img(img, seed)
         return img, label
+    
+    
+    def _parse_data_mask_mog2_single(self, metadata, label):
+        # Read the image
+        img = tf.io.read_file(tf.strings.join([
+                self._images_dir, metadata["image" + str(self._image_idx)]]))
+        img = self._decode_img(img)
+        
+        # Read the mask
+        mask = tf.io.read_file(tf.strings.join([self._images_dir, 
+                                                metadata['mask_MOG2']]))
+        mask = self._decode_img(mask, is_mask=True)
+        
+        # Augment the image and the mask
+        seed = np.random.randint(1000)
+        img = self._augment_img(img, seed)
+        mask = self._augment_img(mask, seed, is_mask=True)
+        
+        # Append the mask to the image
+        final_image = tf.concat([img, mask], axis=2)
+        
+        return final_image
 
 
     def _parse_data_flat(self, metadata, label):
