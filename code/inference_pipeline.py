@@ -138,7 +138,7 @@ def get_layer_outputs(model, required_layers, input_tensors):
     return savers
 
 
-def load_and_get_model_for_inference(trained_model_arch, trained_checkpoint_dir, input_shape, num_classes):
+def load_and_get_model_for_inference(trained_model_arch, trained_checkpoint_dir, filetype, input_shape, num_classes):
     model_factory = ModelFactory()
     model = model_factory.get_model(trained_model_arch,
                                     input_shape,
@@ -146,8 +146,15 @@ def load_and_get_model_for_inference(trained_model_arch, trained_checkpoint_dir,
                                     num_classes=num_classes,
                                     learning_rate=0.001)  # A dummy learning rate since it is test mode.
     # THe ModelCheckpoint in train pipeline saves the weights inside the checkpoint directory as follows.
-    weights_path = os.path.join(trained_checkpoint_dir, "variables", "variables")
-    model.load_weights(weights_path)
+
+
+    if filetype == '.h5':
+        weights_path = trained_checkpoint_dir + "best_model_dir-auc.h5"
+        model = tf.keras.models.load_model(weights_path)
+    else:
+        weights_path = os.path.join(trained_checkpoint_dir, "variables", "variables")
+        model.load_weights(weights_path)
+
     print("The model has been created and the weights have been loaded from: %s" % weights_path)
     model.summary()
     return model
@@ -209,6 +216,7 @@ def inference_pipeline(test_metadata_file_path,
                        out_dir,
                        trained_model_arch,
                        trained_checkpoint_dir,
+                       filetype,
                        num_classes,
                        label_name=None,
                        sequence_image_count=1,
@@ -275,7 +283,7 @@ def inference_pipeline(test_metadata_file_path,
     print("There are %s test sequences." % num_test_sequences)
 
     # Create the model architecture and load the trained weights from checkpoint dir.
-    model = load_and_get_model_for_inference(trained_model_arch, trained_checkpoint_dir, input_size, num_classes)
+    model = load_and_get_model_for_inference(trained_model_arch, trained_checkpoint_dir, filetype, input_size, num_classes)
 
     # Extract the predicted probabilities and corresponding labels.
     # This would be a list of (pred, label) tuples if this is_sequence_model.
@@ -358,6 +366,7 @@ if __name__ == "__main__":
                        args.out_dir,
                        args.trained_model_arch,
                        args.trained_checkpoint_dir,
+                       args.filetype,
                        num_classes,
                        label_name=label_name,
                        sequence_image_count=sequence_image_count,
