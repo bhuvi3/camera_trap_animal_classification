@@ -54,8 +54,8 @@ def get_args():
                         required=True,
                         help="The name of the model checkpoint directory created using train pipeline.")
     parser.add_argument('--filetype',
-                        required=True,
-                        help="The type of extension used to used to save the model")
+                        default="tf",
+                        help="The type of saved model used, select from ['.h5', 'tf']. Default: 'tf'.")
     parser.add_argument('--extract-layers',
                         default=None,
                         help="The names of the model layers (as a comma separated values) to be extracted. "
@@ -145,15 +145,15 @@ def load_and_get_model_for_inference(trained_model_arch, trained_checkpoint_dir,
                                     is_training=False,
                                     num_classes=num_classes,
                                     learning_rate=0.001)  # A dummy learning rate since it is test mode.
-    # THe ModelCheckpoint in train pipeline saves the weights inside the checkpoint directory as follows.
-
-
+    # The ModelCheckpoint in train pipeline saves the weights inside the checkpoint directory as follows.
     if filetype == '.h5':
         weights_path = trained_checkpoint_dir + "best_model_dir-auc.h5"
         model = tf.keras.models.load_model(weights_path)
-    else:
+    elif filetype == 'tf':
         weights_path = os.path.join(trained_checkpoint_dir, "variables", "variables")
         model.load_weights(weights_path)
+    else:
+        raise ValueError("The provided saved model filetype not recognized: %s" % filetype)
 
     print("The model has been created and the weights have been loaded from: %s" % weights_path)
     model.summary()
@@ -233,6 +233,7 @@ def inference_pipeline(test_metadata_file_path,
     :param out_dir: The path to the output dir to which the evaluation results files need to be written.
     :param trained_model_arch: The name of the trained model architecture which is present in the 'models' module.
     :param trained_checkpoint_dir: The name of the model checkpoint directory created using train pipeline.
+    :param filetype: The type of saved model used, select from ['.h5', 'tf']. Default: 'tf'.
     :param num_classes: The number of classes.
     :param label_name: The name of the label column in the metadata csv file.
     :param sequence_image_count: The number of images in the sequence dataset. Default: 1.

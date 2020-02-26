@@ -124,7 +124,9 @@ python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.
 # -------------------
 # Darshan:
 # Model: mask_background_mog2_single_balanced
-python train_pipeline.py --train-meta-file ../data/final_dataset_train-trial.csv --val-meta-file ../data/final_dataset_val-trial.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/mask-background-trial-1 --model-arch resnet152_mask_pretrained_imagenet --data-pipeline-mode mode_mask_mog2_single --batch-size 64 --epochs 1 --learning-rate 0.001 --image-size 224
+python train_pipeline.py --train-meta-file ../data/final_dataset_train-trial.csv --val-meta-file ../data/final_dataset_val-trial.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/mask-background-trial-1 --model-arch resnet152_mask_pretrained_imagenet --data-pipeline-mode mode_mask_mog2_single --batch-size 16 --epochs 1 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005
+
+python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/mask_MOG2_4channel_1 --model-arch resnet152_mask_pretrained_imagenet --data-pipeline-mode mode_mask_mog2_single --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/mask_MOG2_4channel_1.log 2>&1 & [gpumachine-4, IN PROCESS(132)]
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------
 
