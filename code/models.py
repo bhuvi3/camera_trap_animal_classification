@@ -353,6 +353,33 @@ def resnet152_pretrained_imagenet_lstm_avg_pool(input_shape, is_training=False, 
 
     return model
 
+def resnet50_pretrained_imagenet_lstm_custom_loss(input_shape, is_training=False, num_classes=1, learning_rate=0.001):
+
+    inputs = keras.Input(shape=input_shape, name='input')
+
+    model_pretrained_conv = tf.keras.applications.resnet50.ResNet50(weights='imagenet', include_top=False)
+    model_pretrained_conv_time_dist = TimeDistributed(model_pretrained_conv)(inputs, training=is_training)
+
+    avg_pool = TimeDistributed(layers.GlobalAveragePooling2D(name="avg_pool"))(model_pretrained_conv_time_dist)
+
+    lstm_layer = LSTM(256, time_major=False, return_sequences=True)(avg_pool, training=is_training)
+
+
+    if num_classes <= 2:
+        predictions = TimeDistributed(layers.Dense(1, activation="sigmoid", name="predictions"))(lstm_layer)
+        predictions = layers.GlobalAveragePooling1D(name="1Dpool")(predictions)
+        loss = tf.keras.losses.BinaryCrossentropy()
+    else:
+        predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(lstm_layer)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
+
+    model = keras.Model(inputs=inputs, outputs=predictions, name="resnet50_pretrained_imagenet_lstm_custom_loss")
+    model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),
+            loss=loss,
+                  metrics=['accuracy', keras.metrics.AUC(curve='ROC')])
+
+    return model
+
 def resnet152_pretrained_imagenet_lstm_custom_loss(input_shape, is_training=False, num_classes=1, learning_rate=0.001):
 
     inputs = keras.Input(shape=input_shape, name='input')
@@ -397,8 +424,10 @@ AVAILABLE_MODEL_ARCHS = {
     # Sequence-based models.
     "resnet50_pretrained_imagenet_lstm": resnet50_pretrained_imagenet_lstm,
     "resnet50_pretrained_imagenet_lstm_avg_pool": resnet50_pretrained_imagenet_lstm_avg_pool,
+    "resnet50_pretrained_imagenet_lstm_custom_loss": resnet50_pretrained_imagenet_lstm_custom_loss,
     "resnet152_pretrained_imagenet_lstm_avg_pool": resnet152_pretrained_imagenet_lstm_avg_pool,
     "resnet152_pretrained_imagenet_lstm_custom_loss": resnet152_pretrained_imagenet_lstm_custom_loss,
+
     
     # Mask-based models
     "resnet152_mask_pretrained_imagenet": resnet152_mask_pretrained_imagenet
