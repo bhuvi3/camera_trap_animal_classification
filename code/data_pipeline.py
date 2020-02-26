@@ -255,12 +255,13 @@ class PipelineGenerator(object):
         seed = np.random.randint(1000)
         img = self._augment_img(img, seed)
         mask = self._augment_img(mask, seed, is_mask=True)
-        mask = tf.expand_dims(mask, 2)
+        img_size = list(self._image_size)
+        img_size.append(1)
+        mask = tf.reshape(mask, img_size)
         
         # Append the mask to the image
         final_image = tf.concat([img, mask], axis=2)
-        img_size = list(self._image_size)
-        img_size.append(4)
+        img_size[-1] = 4
         final_image.set_shape(tuple(img_size))
         
         return final_image, label
