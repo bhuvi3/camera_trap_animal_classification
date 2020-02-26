@@ -55,6 +55,10 @@ def get_args():
                         type=int,
                         default=2,
                         help="The number of epochs (full train dataset) to wait before early stopping. Default: 2.")
+    parser.add_argument('--min-delta-auc',
+                        type=float,
+                        default=0.01,
+                        help="The minimum delta of validation auc for early stopping after patience. Default: 0.01.")
     parser.add_argument('--image-size',
                         type=int,
                         default=224,
@@ -79,6 +83,7 @@ def train(train_metadata_file_path,
           batch_size=32,
           learning_rate=0.001,
           patience=2,
+          min_delta_auc=0.01,
           input_size=(224, 224, 3)):
     """
     Train a VGG16 model based on single image.
@@ -98,6 +103,7 @@ def train(train_metadata_file_path,
     :param batch_size: The batch size used for the data. Ensure that it fits within the GPU memory. Default: 32.
     :param learning_rate: The constant learning rate to be used for the Adam optimizer. Default: 0.001.
     :param patience: The number of epochs (full train dataset) to wait before early stopping. Default: 2.
+    :param min_delta_auc: The minimum delta of validation auc for early stopping after patience. Default: 0.01.
     :param input_size: The shape of the tensors returned by the data pipeline mode. Default: (224, 224, 3).
 
     """
@@ -106,7 +112,7 @@ def train(train_metadata_file_path,
 
     train_data_epoch_subdivisions = 4
     early_stop_monitor = "val_auc"
-    early_stop_min_delta = 0.01
+    early_stop_min_delta = min_delta_auc
     early_stop_patience = patience * train_data_epoch_subdivisions  # One run through the train dataset.
     prefetch_buffer_size = 3  # Can be also be set to tf.data.experimental.AUTOTUNE
 
@@ -248,4 +254,5 @@ if __name__ == "__main__":
           batch_size=args.batch_size,
           learning_rate=args.learning_rate,
           patience=args.patience,
+          min_delta_auc=args.min_delta_auc,
           input_size=input_size)
