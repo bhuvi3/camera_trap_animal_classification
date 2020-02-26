@@ -398,7 +398,10 @@ AVAILABLE_MODEL_ARCHS = {
     "resnet50_pretrained_imagenet_lstm": resnet50_pretrained_imagenet_lstm,
     "resnet50_pretrained_imagenet_lstm_avg_pool": resnet50_pretrained_imagenet_lstm_avg_pool,
     "resnet152_pretrained_imagenet_lstm_avg_pool": resnet152_pretrained_imagenet_lstm_avg_pool,
-    "resnet152_pretrained_imagenet_lstm_custom_loss": resnet152_pretrained_imagenet_lstm_custom_loss
+    "resnet152_pretrained_imagenet_lstm_custom_loss": resnet152_pretrained_imagenet_lstm_custom_loss,
+    
+    # Mask-based models
+    "resnet152_mask_pretrained_imagenet": resnet152_mask_pretrained_imagenet
 }
 
 

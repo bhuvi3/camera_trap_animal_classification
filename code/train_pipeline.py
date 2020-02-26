@@ -55,7 +55,6 @@ def get_args():
                         type=int,
                         default=2,
                         help="The number of epochs (full train dataset) to wait before early stopping. Default: 2.")
-
     parser.add_argument('--image-size',
                         type=int,
                         default=224,
@@ -230,6 +229,8 @@ if __name__ == "__main__":
 
     if args.data_pipeline_mode == PipelineGenerator.MODE_SEQUENCE:
         input_size = (sequence_image_count, args.image_size, args.image_size, 3)
+    elif args.data_pipeline_mode == PipelineGenerator.MODE_MASK_MOG2_SINGLE:
+        input_size = (args.image_size, args.image_size, 4)
     else:
         input_size = (args.image_size, args.image_size, 3)
 

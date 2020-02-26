@@ -164,3 +164,7 @@ python compute_roc.py --preds-labels-file ../inference_outputs/baseline_7_balanc
 python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_8_balanced/val_auc --batch-size 32 --trained-model-arch resnet152_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_8_balanced/best_model_dir-auc.ckpt --image-size 224 > ../logs/inference-baseline_8_balanced-val_auc.log 2>&1 &
 
 python compute_roc.py --preds-labels-file ../inference_outputs/baseline_8_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_8_balanced/val_auc/evaluation/individual-roc
+
+# -------------------
+# Model: mask_background_mog2_single_balanced
+python train_pipeline.py --train-meta-file ../data/final_dataset_train-trial.csv --val-meta-file ../data/final_dataset_val-trial.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/mask-background-trial-1 --model-arch resnet152_mask_pretrained_imagenet --data-pipeline-mode mode_mask_mog2_single --batch-size 64 --epochs 1 --learning-rate 0.001 --image-size 224
