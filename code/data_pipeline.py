@@ -259,6 +259,9 @@ class PipelineGenerator(object):
         
         # Append the mask to the image
         final_image = tf.concat([img, mask], axis=2)
+        img_size = list(self._image_size)
+        img_size.append(4)
+        final_image.set_shape(tuple(img_size))
         
         return final_image, label
 
