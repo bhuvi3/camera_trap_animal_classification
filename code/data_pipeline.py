@@ -318,6 +318,8 @@ class PipelineGenerator(object):
 
         image_col_names = ["image" + str(img_num) for img_num in range(1, self._sequence_image_count + 1)]
         file_paths = data_csv[image_col_names]
+        mask_columns = [mask_col for mask_col in data_csv.columns if mask_col.startswith('mask')]
+        file_paths.extend(mask_columns)
         labels = data_csv[[self._label_name]]
         dataset_files = tf.data.Dataset.from_tensor_slices((file_paths.to_dict('list'), labels.values.reshape(-1, )))
 
