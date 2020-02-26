@@ -171,7 +171,7 @@ def resnet101_pretrained_imagenet(input_shape, is_training=False, num_classes=1,
 def resnet152_mask_pretrained_imagenet(input_shape, is_training=False, 
                                        num_classes=1, learning_rate=0.001):
     
-    weights_file = os.path.join(os.getcwd(), "data", "resnet152_mask_weights.npy")
+    weights_file = os.path.join(os.getcwd(), "..", "data", "resnet152_mask_weights.npy")
     url = "https://capstonestorageaccount.blob.core.windows.net/capstone-container/resnet152_mask_weights.npy"
 
     # Check if the weights file is present else download it
