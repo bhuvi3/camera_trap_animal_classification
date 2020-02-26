@@ -5,15 +5,17 @@ This module contains the Tensorflow Keras models.
 
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
+import os
+
+import numpy as np
+import tensorflow as tf
+import wget
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.layers import LSTM, TimeDistributed
-
-import tensorflow as tf
-
-import os
 
 
 def _add_conv_block(num_filters, inputs, is_training, name_prefix, kernel_regularizer=None):
@@ -169,29 +171,39 @@ def resnet101_pretrained_imagenet(input_shape, is_training=False, num_classes=1,
 def resnet152_mask_pretrained_imagenet(input_shape, is_training=False, 
                                        num_classes=1, learning_rate=0.001):
     
-    weights_file = os.path.join(os.getcwd(), 'data')
-    # Check if the weights file is present
-    
-    
-    
-    inputs = keras.Input(shape=input_shape, name='input')
+    weights_file = os.path.join(os.getcwd(), "data", "resnet152_mask_weights.npy")
+    url = "https://capstonestorageaccount.blob.core.windows.net/capstone-container/resnet152_mask_weights.npy"
 
-    model_pretrained_conv = tf.keras.applications.ResNet152(weights='imagenet', include_top=False)
+    # Check if the weights file is present else download it
+    if not os.path.isfile(weights_file):
+        wget.download(url, weights_file)
+        
+    # Load the weights
+    weights = np.load(weights_file, allow_pickle=True)
+    
+    # Build the model
+    inputs = tf.keras.Input(shape=input_shape, name='input')
+
+    model_pretrained_conv = tf.keras.applications.ResNet152(weights=None, 
+                                                            include_top=False, 
+                                                            input_tensor=inputs)
+    model_pretrained_conv.set_weights(weights)
     output_pretrained_conv = model_pretrained_conv(inputs, training=is_training)
 
-    avg_pool = layers.GlobalAveragePooling2D(name="avg_pool")(output_pretrained_conv)
+    avg_pool = tf.keras.layers.GlobalAveragePooling2D(name="avg_pool")(output_pretrained_conv)
 
     if num_classes <= 2:
-        predictions = layers.Dense(1, activation="sigmoid", name="predictions")(avg_pool)
+        predictions = tf.keras.layers.Dense(1, activation="sigmoid", name="predictions")(avg_pool)
         loss = tf.keras.losses.BinaryCrossentropy()
     else:
         predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(avg_pool)
         loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
 
-    model = keras.Model(inputs=inputs, outputs=predictions, name="resnet152_pretrained_imagenet")
-    model.compile(optimizer=keras.optimizers.Adam(lr=learning_rate),
-                  loss=loss,
-                  metrics=['accuracy', keras.metrics.AUC(curve='ROC')])
+    model = tf.keras.Model(inputs=inputs, outputs=predictions, 
+                           name="resnet152_mask_pretrained_imagenet")
+    model.compile(optimizer=tf.keras.optimizers.Adam(lr=learning_rate), 
+                  loss=loss, 
+                  metrics=['accuracy', tf.keras.metrics.AUC(curve='ROC')])
 
     return model
 
