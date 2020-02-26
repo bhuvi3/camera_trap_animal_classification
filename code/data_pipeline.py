@@ -259,7 +259,7 @@ class PipelineGenerator(object):
         # Append the mask to the image
         final_image = tf.concat([img, mask], axis=2)
         
-        return final_image
+        return final_image, label
 
 
     def _parse_data_flat(self, metadata, label):
