@@ -69,6 +69,8 @@ class PipelineGenerator(object):
                  
     MODE_SEQUENCE: Configuration to make the pipeline return the sequence of 
                    images as a tensor (array) with a single label.
+                   
+    MODE_MASK_MOG2: 
             
     """
     

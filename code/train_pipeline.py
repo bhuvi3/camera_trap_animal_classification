@@ -228,7 +228,7 @@ if __name__ == "__main__":
     label_name = "has_animal"
     sequence_image_count = 3
 
-    if args.data_pipeline_mode == "mode_sequence":
+    if args.data_pipeline_mode == PipelineGenerator.MODE_SEQUENCE:
         input_size = (sequence_image_count, args.image_size, args.image_size, 3)
     else:
         input_size = (args.image_size, args.image_size, 3)
