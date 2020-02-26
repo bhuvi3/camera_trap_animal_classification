@@ -178,8 +178,7 @@ class PipelineGenerator(object):
                                          crop_size=self._image_size)
             
             # Squeeze out the final dimension
-            if not is_mask:
-                x = tf.squeeze(x)
+            x = tf.squeeze(x)
             
             return x
 
@@ -256,6 +255,7 @@ class PipelineGenerator(object):
         seed = np.random.randint(1000)
         img = self._augment_img(img, seed)
         mask = self._augment_img(mask, seed, is_mask=True)
+        mask = tf.expand_dims(mask, 2)
         
         # Append the mask to the image
         final_image = tf.concat([img, mask], axis=2)

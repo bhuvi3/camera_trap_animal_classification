@@ -186,7 +186,7 @@ def resnet152_mask_pretrained_imagenet(input_shape, is_training=False,
 
     model_pretrained_conv = tf.keras.applications.ResNet152(weights=None, 
                                                             include_top=False, 
-                                                            input_tensor=inputs)
+                                                            input_shape=input_shape)
     model_pretrained_conv.set_weights(weights)
     output_pretrained_conv = model_pretrained_conv(inputs, training=is_training)
 
