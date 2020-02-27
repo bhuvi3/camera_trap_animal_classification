@@ -75,6 +75,10 @@ class PipelineGenerator(object):
 
     MODE_MASK_MOG2_SEQUENCE: Configuration similar to MODE_SEQUENCE except each 
                              image has an additional mask channel.
+                             
+    MODE_MASK_MOG2_MULTICHANNEL: Configuration to make the pipeline return all 
+                                 the images along with the mask concatenated 
+                                 along the depth channel.
             
     """
     
@@ -84,9 +88,12 @@ class PipelineGenerator(object):
     MODE_SEQUENCE = "mode_sequence"
     MODE_MASK_MOG2_SINGLE = "mode_mask_mog2_single"
     MODE_MASK_MOG2_SEQUENCE = "mode_mask_mog2_sequence"
+    MODE_MASK_MOG2_MULTICHANNEL = "mode_mask_mog2_multichannel"
     
-    SEQUENCE_MODES = [MODE_SEQUENCE, MODE_MASK_MOG2_SEQUENCE]
-    MASK_MODES = [MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_SEQUENCE]
+    MASK_MODES = [MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_SEQUENCE, 
+                  MODE_MASK_MOG2_MULTICHANNEL]
+    SEQUENCE_MODES = [MODE_SEQUENCE, MODE_MASK_MOG2_SEQUENCE, 
+                      MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_MULTICHANNEL]
     VALID_MODES = [MODE_ALL, MODE_FLAT_ALL, MODE_SINGLE, MODE_SEQUENCE, 
                    MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_SEQUENCE]
     
@@ -130,6 +137,8 @@ class PipelineGenerator(object):
             self._parse_data = self._parse_data_mask_mog2_single
         elif self._mode == self.MODE_MASK_MOG2_SEQUENCE:
             self._parse_data = self._parse_data_mask_mog2_sequence
+        elif self._mode == self.MODE_MASK_MOG2_MULTICHANNEL:
+            self._parse_data = self._parse_data_mask_mog2_multichannel
         else:
             self._parse_data = self._parse_data_single
 
@@ -325,6 +334,30 @@ class PipelineGenerator(object):
             images.append(final_image)
             
         return tf.convert_to_tensor(images), label
+
+
+    def _parse_data_mask_mog2_multichannel(self, metadata, label):
+        images = []
+        seed = np.random.randint(1000)
+        
+        # Read each image, augment it and add it to the list
+        for img_num in range(1, self._sequence_image_count + 1):
+            img = tf.io.read_file(tf.strings.join([
+                    self._images_dir, metadata["image" + str(img_num)]]))
+            img = self._decode_img(img)
+            img = self._augment_img(img, seed)
+            images.append(img)
+            
+        # Read and augment the mask. Add it to the list
+        mask = tf.io.read_file(tf.strings.join([self._images_dir, 
+                                                metadata['mask_MOG2']]))
+        mask = self._decode_img(mask, is_mask=True)
+        mask = self._augment_img(mask, seed, is_mask=True)
+        images.append(mask)
+        
+        # Append all the images and the mask
+        final_image = tf.concat(images, axis=2)
+        return final_image, label
 
 
     def get_size(self):

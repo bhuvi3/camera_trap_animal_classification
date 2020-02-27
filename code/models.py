@@ -243,7 +243,7 @@ def resnet152_mask_mog2_10channel_pretrained_imagenet(input_shape,
         loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
 
     model = tf.keras.Model(inputs=inputs, outputs=predictions, 
-                           name="resnet152_mask_pretrained_imagenet")
+                           name="resnet152_mask_mog2_10channel_pretrained_imagenet")
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=learning_rate), 
                   loss=loss, 
                   metrics=['accuracy', tf.keras.metrics.AUC(curve='ROC')])
