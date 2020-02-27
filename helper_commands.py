@@ -197,3 +197,12 @@ python compute_roc.py --preds-labels-file ../inference_outputs/baseline_8_balanc
 python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_9_balanced/val_auc --batch-size 32 --trained-model-arch resnet152v2_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_9_balanced/best_model_dir-auc.ckpt --image-size 224 > ../logs/inference-baseline_9_balanced-val_auc.log 2>&1 &
 
 python compute_roc.py --preds-labels-file ../inference_outputs/baseline_9_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_9_balanced/val_auc/evaluation/individual-roc
+
+
+### Optical Flow.
+# Generate optical flow images [gpumachine-1]
+python generate_optical_flow_images.py --metadata-file ../data/final_dataset_train.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../../wellington_data/images-resized-224-opticalflow/ &  [IN PROCESS(105980)]
+
+python generate_optical_flow_images.py --metadata-file ../data/final_dataset_val.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../../wellington_data/images-resized-224-opticalflow/ &  [TODO]
+
+python generate_optical_flow_images.py --metadata-file ../data/final_dataset_test.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../../wellington_data/images-resized-224-opticalflow/ &  [TODO]
