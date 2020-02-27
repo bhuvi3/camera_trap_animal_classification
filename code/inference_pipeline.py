@@ -271,7 +271,9 @@ def inference_pipeline(test_metadata_file_path,
     shutil.copy(test_metadata_file_path, os.path.join(out_dir, os.path.basename(test_metadata_file_path)))
 
     # Load the test data pipeline.
-    if data_pipeline_mode not in PipelineGenerator.SEQUENCE_MODES:
+    if data_pipeline_mode in PipelineGenerator.SEQUENCE_MODES:
+        pipeline_mode = data_pipeline_mode
+    else:
         pipeline_mode = PipelineGenerator.MODE_SEQUENCE
     
     pipeline_gen = PipelineGenerator(test_metadata_file_path,
