@@ -86,17 +86,18 @@ def run_optical_flow_generation(data_row, images_dir, out_dir):
 
     # Save the flow images, and the average flow image.
     for i, cur_flow_image in enumerate(flow_images):
-        cv2.imwrite(os.path.join(out_dir, "%s_opticalflow_%s.png" % (seq_id, i + 1)), cur_flow_image)
+        cv2.imwrite(os.path.join(out_dir, "%s_opticalflowGF_%s.png" % (seq_id, i + 1)), cur_flow_image)
 
-    cv2.imwrite(os.path.join(out_dir, "%s_opticalflow_%s.png" % (seq_id, "average")), avg_flow_image)
+    cv2.imwrite(os.path.join(out_dir, "%s_opticalflowGF_%s.png" % (seq_id, "average")), avg_flow_image)
 
 
 if __name__ == "__main__":
     args = get_args()
-    run_optical_flow_generation(args)
+
+    if not os.path.exists(args.out_dir):
+        os.makedirs(args.out_dir)
+
     dataset = pd.read_csv(args.metadata_file)
-    path_prefix = os.path.join(os.getcwd(), '..', 'data', 'images', 'images-resized')
-    output_path = os.path.join(os.getcwd(), '..', 'data', 'images', 'images-resized')
 
     start_time = time.time()
     Parallel(n_jobs=-1)(delayed(run_optical_flow_generation)(data_row,
