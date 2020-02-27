@@ -208,6 +208,49 @@ def resnet152_mask_pretrained_imagenet(input_shape, is_training=False,
     return model
 
 
+def resnet152_mask_mog2_10channel_pretrained_imagenet(input_shape, 
+                                                      is_training=False, 
+                                                      num_classes=1, 
+                                                      learning_rate=0.001):
+    
+    weights_file = os.path.join(os.getcwd(), "..", "data", 
+                                "resnet152_10channel_mask_weights.npy")
+    url = "https://capstonestorageaccount.blob.core.windows.net/capstone-container/resnet152_10channel_mask_weights.npy"
+
+    # Check if the weights file is present else download it
+    if not os.path.isfile(weights_file):
+        wget.download(url, weights_file)
+        
+    # Load the weights
+    weights = np.load(weights_file, allow_pickle=True)
+    
+    # Build the model
+    inputs = tf.keras.Input(shape=input_shape, name='input')
+
+    model_pretrained_conv = tf.keras.applications.ResNet152(weights=None, 
+                                                            include_top=False, 
+                                                            input_shape=input_shape)
+    model_pretrained_conv.set_weights(weights)
+    output_pretrained_conv = model_pretrained_conv(inputs, training=is_training)
+
+    avg_pool = tf.keras.layers.GlobalAveragePooling2D(name="avg_pool")(output_pretrained_conv)
+
+    if num_classes <= 2:
+        predictions = tf.keras.layers.Dense(1, activation="sigmoid", name="predictions")(avg_pool)
+        loss = tf.keras.losses.BinaryCrossentropy()
+    else:
+        predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(avg_pool)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
+
+    model = tf.keras.Model(inputs=inputs, outputs=predictions, 
+                           name="resnet152_mask_pretrained_imagenet")
+    model.compile(optimizer=tf.keras.optimizers.Adam(lr=learning_rate), 
+                  loss=loss, 
+                  metrics=['accuracy', tf.keras.metrics.AUC(curve='ROC')])
+
+    return model
+
+
 def resnet152_pretrained_imagenet(input_shape, is_training=False, num_classes=1, learning_rate=0.001):
     inputs = keras.Input(shape=input_shape, name='input')
 
@@ -430,7 +473,8 @@ AVAILABLE_MODEL_ARCHS = {
 
     
     # Mask-based models
-    "resnet152_mask_pretrained_imagenet": resnet152_mask_pretrained_imagenet
+    "resnet152_mask_pretrained_imagenet": resnet152_mask_pretrained_imagenet,
+    "resnet152_mask_mog2_10channel_pretrained_imagenet": resnet152_mask_mog2_10channel_pretrained_imagenet
 }
 
 
