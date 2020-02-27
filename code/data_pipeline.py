@@ -209,8 +209,10 @@ class PipelineGenerator(object):
         # Convert the compressed string to a uint8 tensor
         if is_mask:
             img = tf.image.decode_image(img, channels=1)
+            img.set_shape(self._image_size + (1,))
         else:    
             img = tf.image.decode_image(img, channels=3)
+            img.set_shape(self._image_size + (3,))
 
         # Use `convert_image_dtype` to convert to floats in the [0,1] range.
         img = tf.image.convert_image_dtype(img, tf.float32)
