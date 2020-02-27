@@ -87,13 +87,13 @@ class PipelineGenerator(object):
     
     SEQUENCE_MODES = [MODE_SEQUENCE, MODE_MASK_MOG2_SEQUENCE]
     MASK_MODES = [MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_SEQUENCE]
+    VALID_MODES = [MODE_ALL, MODE_FLAT_ALL, MODE_SINGLE, MODE_SEQUENCE, 
+                   MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_SEQUENCE]
     
     def __init__(self, dataset_file, images_dir, sequence_image_count=3,
                  label_name='has_animal', mode=MODE_ALL, image_size=(224, 224),
                  image_idx=1, resize=None, is_training=True,
                  shuffle_buffer_size=10000, **kwargs):
-        self._modes = [self.MODE_ALL, self.MODE_FLAT_ALL, self.MODE_SINGLE, 
-                       self.MODE_SEQUENCE, self.MODE_MASK_MOG2_SINGLE]
         self._dataset_file = dataset_file
         self._images_dir = images_dir
         self._sequence_image_count = sequence_image_count
@@ -108,9 +108,9 @@ class PipelineGenerator(object):
         self._AUTOTUNE = tf.data.experimental.AUTOTUNE
         self._size = None
 
-        if self._mode not in self._modes:
+        if self._mode not in self.VALID_MODES:
             raise ValueError("Invalid mode. Please select one from {}."\
-                             .format(self._modes))
+                             .format(self.VALID_MODES))
         
         if (self._mode in [self.MODE_SINGLE, self.MODE_MASK_MOG2_SINGLE] and 
             (self._image_idx <= 0 or 
