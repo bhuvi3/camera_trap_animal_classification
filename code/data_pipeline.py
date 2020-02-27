@@ -265,14 +265,9 @@ class PipelineGenerator(object):
         seed = np.random.randint(1000)
         img = self._augment_img(img, seed)
         mask = self._augment_img(mask, seed, is_mask=True)
-        img_size = list(self._image_size)
-        img_size.append(1)
-        mask = tf.reshape(mask, img_size)
         
         # Append the mask to the image
         final_image = tf.concat([img, mask], axis=2)
-        img_size[-1] = 4
-        final_image.set_shape(tuple(img_size))
         
         return final_image, label
 
@@ -318,12 +313,6 @@ class PipelineGenerator(object):
         mask = self._decode_img(mask, is_mask=True)
         mask = self._augment_img(mask, seed, is_mask=True)
         
-        # determine image sizes and shape the mask
-        img_size = list(self._image_size)
-        img_size.append(1)
-        mask = tf.reshape(mask, img_size)
-        img_size[-1] = 4
-        
         # Read each image, augment it, append the mask and add it to the list
         for img_num in range(1, self._sequence_image_count + 1):
             img = tf.io.read_file(tf.strings.join([
@@ -333,7 +322,6 @@ class PipelineGenerator(object):
             
             # Append the mask to the image
             final_image = tf.concat([img, mask], axis=2)
-            final_image.set_shape(tuple(img_size))
             images.append(final_image)
             
         return tf.convert_to_tensor(images), label
