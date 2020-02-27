@@ -571,7 +571,7 @@ def resnet152_mask_pretrained_imagenet_lstm_avg_pool(input_shape, is_training=Fa
         loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
 
     model = tf.keras.Model(inputs=inputs, outputs=predictions, 
-                           name="resnet152_mask_pretrained_imagenet")
+                           name="resnet152_mask_pretrained_imagenet_lstm_avg_pool")
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=learning_rate), 
                   loss=loss, 
                   metrics=['accuracy', tf.keras.metrics.AUC(curve='ROC')])
@@ -640,7 +640,7 @@ AVAILABLE_MODEL_ARCHS = {
     "resnet50_pretrained_imagenet_lstm_custom_loss": resnet50_pretrained_imagenet_lstm_custom_loss,
     "resnet152_pretrained_imagenet_lstm_avg_pool": resnet152_pretrained_imagenet_lstm_avg_pool,
     "resnet152_pretrained_imagenet_lstm_custom_loss": resnet152_pretrained_imagenet_lstm_custom_loss,
-    "resnet152_mask_mog2_10channel_pretrained_imagenet_lstm_avg_pool": resnet152_mask_mog2_10channel_pretrained_imagenet_lstm_avg_pool
+    "resnet152_mask_mog2_10channel_pretrained_imagenet_lstm_avg_pool": resnet152_mask_mog2_10channel_pretrained_imagenet_lstm_avg_pool,
     "resnet152_mask_mog2_10channel_pretrained_imagenet_lstm_custom_loss": resnet152_mask_mog2_10channel_pretrained_imagenet_lstm_custom_loss,
     "resnet152_mask_pretrained_imagenet_lstm_avg_pool": resnet152_mask_pretrained_imagenet_lstm_avg_pool,
     "resnet152_mask_pretrained_imagenet_lstm_custom_pool": resnet152_mask_pretrained_imagenet_lstm_custom_pool
