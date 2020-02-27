@@ -237,6 +237,8 @@ if __name__ == "__main__":
         input_size = (sequence_image_count, args.image_size, args.image_size, 3)
     elif args.data_pipeline_mode == PipelineGenerator.MODE_MASK_MOG2_SINGLE:
         input_size = (args.image_size, args.image_size, 4)
+    elif args.data_pipeline_mode == PipelineGenerator.MODE_MASK_MOG2_MULTICHANNEL:
+        input_size = (args.image_size, args.image_size, 10)
     else:
         input_size = (args.image_size, args.image_size, 3)
 
