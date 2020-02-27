@@ -95,7 +95,8 @@ class PipelineGenerator(object):
     SEQUENCE_MODES = [MODE_SEQUENCE, MODE_MASK_MOG2_SEQUENCE, 
                       MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_MULTICHANNEL]
     VALID_MODES = [MODE_ALL, MODE_FLAT_ALL, MODE_SINGLE, MODE_SEQUENCE, 
-                   MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_SEQUENCE]
+                   MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_SEQUENCE, 
+                   MODE_MASK_MOG2_MULTICHANNEL]
     
     def __init__(self, dataset_file, images_dir, sequence_image_count=3,
                  label_name='has_animal', mode=MODE_ALL, image_size=(224, 224),
