@@ -39,9 +39,9 @@ def get_args():
     parser.add_argument('--out-dir',
                         required=True,
                         help="The path to the output dir to which the evaluation results files need to be written.")
-    parser.add_argument('--is-sequence-model',
-                        action="store_true",
-                        help="Specify this flag if this is a sequence-based model. Default: False.")
+    parser.add_argument('--data-pipeline-mode',
+                        required=True,
+                        help="The mode to be used for the data pipeline.")
     parser.add_argument('--batch-size',
                         type=int,
                         default=64,
@@ -220,7 +220,7 @@ def inference_pipeline(test_metadata_file_path,
                        num_classes,
                        label_name=None,
                        sequence_image_count=1,
-                       is_sequence_model=False,
+                       data_pipeline_mode="mode_flat_all",
                        batch_size=32,
                        input_size=(224, 224, 3),
                        extract_layers=None):
@@ -271,17 +271,24 @@ def inference_pipeline(test_metadata_file_path,
     shutil.copy(test_metadata_file_path, os.path.join(out_dir, os.path.basename(test_metadata_file_path)))
 
     # Load the test data pipeline.
+    if data_pipeline_mode in PipelineGenerator.MASK_MODES:
+        pipeline_mode = PipelineGenerator.MODE_MASK_MOG2_SEQUENCE
+    else:
+        pipeline_mode = PipelineGenerator.MODE_SEQUENCE
     pipeline_gen = PipelineGenerator(test_metadata_file_path,
                                      images_dir_path,
                                      is_training=False,
                                      sequence_image_count=sequence_image_count,
                                      label_name=label_name,
-                                     mode="mode_sequence")  # We always use sequence level inference during evaluation.
+                                     mode=pipeline_mode)  # We always use sequence level inference during evaluation.
 
     test_dataset_raw = pipeline_gen.get_pipeline()
     test_dataset_batches = test_dataset_raw.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
     num_test_sequences = pipeline_gen.get_size()
     print("There are %s test sequences." % num_test_sequences)
+    
+    # Infer if the architecture works with sequence of images
+    is_sequence_model = (data_pipeline_mode in PipelineGenerator.SEQUENCE_MODES)
 
     # Create the model architecture and load the trained weights from checkpoint dir.
     model = load_and_get_model_for_inference(trained_model_arch, trained_checkpoint_dir, filetype, input_size, num_classes)
@@ -357,8 +364,10 @@ if __name__ == "__main__":
     label_name = "has_animal"
     sequence_image_count = 3
 
-    if args.is_sequence_model:
+    if args.data_pipeline_mode == PipelineGenerator.MODE_SEQUENCE:
         input_size = (sequence_image_count, args.image_size, args.image_size, 3)
+    elif args.data_pipeline_mode == PipelineGenerator.MODE_MASK_MOG2_SINGLE:
+        input_size = (args.image_size, args.image_size, 4)
     else:
         input_size = (args.image_size, args.image_size, 3)
 
@@ -371,7 +380,7 @@ if __name__ == "__main__":
                        num_classes,
                        label_name=label_name,
                        sequence_image_count=sequence_image_count,
-                       is_sequence_model=args.is_sequence_model,
+                       data_pipeline_mode=args.data_pipeline_mode,
                        batch_size=args.batch_size,
                        input_size=input_size,
                        extract_layers=args.extract_layers)
