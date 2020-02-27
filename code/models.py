@@ -643,8 +643,7 @@ AVAILABLE_MODEL_ARCHS = {
     "resnet152_mask_mog2_10channel_pretrained_imagenet_lstm_avg_pool": resnet152_mask_mog2_10channel_pretrained_imagenet_lstm_avg_pool,
     "resnet152_mask_mog2_10channel_pretrained_imagenet_lstm_custom_loss": resnet152_mask_mog2_10channel_pretrained_imagenet_lstm_custom_loss,
     "resnet152_mask_pretrained_imagenet_lstm_avg_pool": resnet152_mask_pretrained_imagenet_lstm_avg_pool,
-    "resnet152_mask_pretrained_imagenet_lstm_custom_pool": resnet152_mask_pretrained_imagenet_lstm_custom_pool
-
+    "resnet152_mask_pretrained_imagenet_lstm_custom_pool": resnet152_mask_pretrained_imagenet_lstm_custom_pool,
     
     # Mask-based models
     "resnet152_mask_pretrained_imagenet": resnet152_mask_pretrained_imagenet,
