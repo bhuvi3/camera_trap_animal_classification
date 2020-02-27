@@ -275,6 +275,7 @@ def inference_pipeline(test_metadata_file_path,
         pipeline_mode = PipelineGenerator.MODE_MASK_MOG2_SEQUENCE
     else:
         pipeline_mode = PipelineGenerator.MODE_SEQUENCE
+    
     pipeline_gen = PipelineGenerator(test_metadata_file_path,
                                      images_dir_path,
                                      is_training=False,
