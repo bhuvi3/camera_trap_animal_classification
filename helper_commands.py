@@ -44,6 +44,11 @@ cd ../datadrive/camera_trap_animal_classification/code
 
 docker exec -it 3734e31aa5a6 /bin/bash  # gpumachine-2
 
+# Things to install on docker
+pip install pandas
+pip install scikit-learn
+pip install wget
+apt-get install less
 
 # Image Resizing:
 from joblib import Parallel, delayed
@@ -119,6 +124,8 @@ python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.
 
 python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_8_balanced --model-arch resnet152_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 10 --learning-rate 0.0001 --image-size 224 > ../logs/baseline_8_balanced.log 2>&1 & [gpumachine-3, COMPLETED]
 
+python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_8_updated --model-arch resnet152_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/baseline_8_updated.log 2>&1 & [gpumachine-3, IN PROCESS(91)]
+
 python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_9_balanced --model-arch resnet152v2_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 10 --learning-rate 0.0001 --image-size 224 > ../logs/baseline_9_balanced.log 2>&1 & [gpumachine-3, COMPLETED]
 
 # -------------------
@@ -190,3 +197,12 @@ python compute_roc.py --preds-labels-file ../inference_outputs/baseline_8_balanc
 python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_9_balanced/val_auc --batch-size 32 --trained-model-arch resnet152v2_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_9_balanced/best_model_dir-auc.ckpt --image-size 224 > ../logs/inference-baseline_9_balanced-val_auc.log 2>&1 &
 
 python compute_roc.py --preds-labels-file ../inference_outputs/baseline_9_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_9_balanced/val_auc/evaluation/individual-roc
+
+
+### Optical Flow.
+# Generate optical flow images [gpumachine-1]
+python generate_optical_flow_images.py --metadata-file ../data/final_dataset_train.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../../wellington_data/images-resized-224-opticalflow/ &  [DONE]
+
+python generate_optical_flow_images.py --metadata-file ../data/final_dataset_val.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../../wellington_data/images-resized-224-opticalflow/ &  [DONE]
+
+python generate_optical_flow_images.py --metadata-file ../data/final_dataset_test.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../../wellington_data/images-resized-224-opticalflow/ &  [DONE]
