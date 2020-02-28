@@ -160,7 +160,7 @@ def train(train_metadata_file_path,
 
 
     #We use the HDF5 method to store the sequence models due to a bug in tensorflow TimeDistributed wrapper
-    if data_pipeline_mode == 'mode_sequence':
+    if data_pipeline_mode == 'mode_sequence' or data_pipeline_mode == 'mode_mask_mog2_sequence':
         model_extension = ".h5"
     else:
         model_extension = ".ckpt"
