@@ -79,11 +79,6 @@ def compute_roc(preds_labels_file, out_file_prefix, num_thresh=100):
 
     for thresh in thresholds:
         all_preds = np.array(all_scores >= thresh, dtype=np.int8)
-        # Get voted fpr and tpr.
-        cur_y_pred_voted = stats.mode(all_preds).mode.astype(np.int8)[0]
-        cur_voted_fpr, cur_voted_tpr = _get_fpr_tpr(labels, cur_y_pred_voted)
-        voted_fpr.append(cur_voted_fpr)
-        voted_tpr.append(cur_voted_tpr)
 
         # Get first fpr and tpr.
         cur_y_pred_first = all_preds[0]
@@ -91,8 +86,14 @@ def compute_roc(preds_labels_file, out_file_prefix, num_thresh=100):
         first_fpr.append(cur_first_fpr)
         first_tpr.append(cur_first_tpr)
 
-    _plot_roc(voted_fpr, voted_tpr, out_file_prefix + "-voting.png", "Voted from %s Entries" % num_entries)
+        # Get voted fpr and tpr.
+        cur_y_pred_voted = stats.mode(all_preds).mode.astype(np.int8)[0]
+        cur_voted_fpr, cur_voted_tpr = _get_fpr_tpr(labels, cur_y_pred_voted)
+        voted_fpr.append(cur_voted_fpr)
+        voted_tpr.append(cur_voted_tpr)
+
     _plot_roc(first_fpr, first_tpr, out_file_prefix + "-first.png", "First Entry")
+    _plot_roc(voted_fpr, voted_tpr, out_file_prefix + "-voting.png", "Voted from %s Entries" % num_entries)
 
 
 if __name__ == "__main__":
