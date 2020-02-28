@@ -124,9 +124,9 @@ python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.
 
 python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_8_balanced --model-arch resnet152_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 10 --learning-rate 0.0001 --image-size 224 > ../logs/baseline_8_balanced.log 2>&1 & [gpumachine-3, COMPLETED]
 
-python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_8_updated --model-arch resnet152_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/baseline_8_updated.log 2>&1 & [gpumachine-3, IN PROCESS(91)]
-
 python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_9_balanced --model-arch resnet152v2_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 10 --learning-rate 0.0001 --image-size 224 > ../logs/baseline_9_balanced.log 2>&1 & [gpumachine-3, COMPLETED]
+
+python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_8_updated --model-arch resnet152_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/baseline_8_updated.log 2>&1 & [gpumachine-3, IN PROCESS(91)]
 
 # -------------------
 # Darshan:
@@ -153,7 +153,7 @@ python compute_roc.py --preds-labels-file ../inference_outputs/mask_MOG2_4channe
 
 # Running inference pipeline. (specify --is-sequence-model flag for sequence models.)
 # Model: baseline_3
-python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_3/val_acc --batch-size 32 --trained-model-arch vgg16_batchnorm --trained-checkpoint-dir ../trained_models/baseline_3/best_model_dir-acc.ckpt --extract-layers "block1_conv1-Relu,block3_conv3-Relu,block5_conv3-Relu" --image-size 224 > ../logs/inference-baseline_3-val_acc.log 2>&1 &
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_3/val_acc --batch-size 32 --trained-model-arch vgg16_batchnorm --trained-checkpoint-dir ../trained_models/baseline_3/best_model_dir-acc.ckpt --extract-layers "block1_conv1-Relu,block3_conv3-Relu,block5_conv3-Relu" --image-size 224 --data-pipeline-mode mode_flat_all > ../logs/inference-baseline_3-val_acc.log 2>&1 &
 
 python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_3/val_loss --batch-size 32 --trained-model-arch vgg16_batchnorm --trained-checkpoint-dir ../trained_models/baseline_3/best_model_dir-loss.ckpt --extract-layers "block1_conv1-Relu,block3_conv3-Relu,block5_conv3-Relu" --image-size 224 > ../logs/inference-baseline_3-val_loss.log 2>&1 &
 
@@ -164,40 +164,44 @@ python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balance
 
 #---------
 # Model: baseline_3_balanced
-python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_3_balanced/val_acc --batch-size 32 --trained-model-arch vgg16_batchnorm --trained-checkpoint-dir ../trained_models/baseline_3_balanced/best_model_dir-acc.ckpt --image-size 224 > ../logs/inference-baseline_3_balanced-val_acc.log 2>&1 &
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_3_balanced/val_acc --batch-size 32 --trained-model-arch vgg16_batchnorm --trained-checkpoint-dir ../trained_models/baseline_3_balanced/best_model_dir-acc.ckpt --image-size 224 --data-pipeline-mode mode_flat_all > ../logs/inference-baseline_3_balanced-val_acc.log 2>&1
 
-python compute_roc.py --preds-labels-file ../inference_outputs/baseline_3_balanced/val_acc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_3_balanced/val_acc/evaluation/individual-roc.png
+python compute_roc.py --preds-labels-file ../inference_outputs/baseline_3_balanced/val_acc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_3_balanced/val_acc/evaluation/individual-roc
 
 # Model: baseline_4_balanced
-python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_4_balanced/val_acc --batch-size 32 --trained-model-arch vgg16_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_4_balanced/best_model_dir-acc.ckpt --image-size 224 > ../logs/inference-baseline_4_balanced-val_acc.log 2>&1 &
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_4_balanced/val_acc --batch-size 32 --trained-model-arch vgg16_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_4_balanced/best_model_dir-acc.ckpt --image-size 224 --data-pipeline-mode mode_flat_all > ../logs/inference-baseline_4_balanced-val_acc.log 2>&1
 
-python compute_roc.py --preds-labels-file ../inference_outputs/baseline_4_balanced/val_acc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_4_balanced/val_acc/evaluation/individual-roc.png
+python compute_roc.py --preds-labels-file ../inference_outputs/baseline_4_balanced/val_acc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_4_balanced/val_acc/evaluation/individual-roc
 
 # Model: baseline_5_balanced
-python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_5_balanced/val_auc --batch-size 32 --trained-model-arch resnet50_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_5_balanced/best_model_dir-auc.ckpt --image-size 224 > ../logs/inference-baseline_5_balanced-val_auc.log 2>&1 &
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_5_balanced/val_auc --batch-size 32 --trained-model-arch resnet50_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_5_balanced/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_flat_all > ../logs/inference-baseline_5_balanced-val_auc.log 2>&1
 
-python compute_roc.py --preds-labels-file ../inference_outputs/baseline_5_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_5_balanced/val_auc/evaluation/individual-roc.png
+python compute_roc.py --preds-labels-file ../inference_outputs/baseline_5_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_5_balanced/val_auc/evaluation/individual-roc
 
 # Model: baseline_6_balanced
-python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_6_balanced/val_auc --batch-size 32 --trained-model-arch inceptionresnetv2_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_6_balanced/best_model_dir-auc.ckpt --image-size 224 > ../logs/inference-baseline_6_balanced-val_auc.log 2>&1 &
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_6_balanced/val_auc --batch-size 32 --trained-model-arch inceptionresnetv2_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_6_balanced/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_flat_all > ../logs/inference-baseline_6_balanced-val_auc.log 2>&1
 
-python compute_roc.py --preds-labels-file ../inference_outputs/baseline_6_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_6_balanced/val_auc/evaluation/individual-roc.png
+python compute_roc.py --preds-labels-file ../inference_outputs/baseline_6_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_6_balanced/val_auc/evaluation/individual-roc
 
 # Model: baseline_7_balanced
-python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_7_balanced/val_auc --batch-size 32 --trained-model-arch resnet101_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_7_balanced/best_model_dir-auc.ckpt --image-size 224 > ../logs/inference-baseline_7_balanced-val_auc.log 2>&1 &
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_7_balanced/val_auc --batch-size 32 --trained-model-arch resnet101_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_7_balanced/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_flat_all > ../logs/inference-baseline_7_balanced-val_auc.log 2>&1
 
 python compute_roc.py --preds-labels-file ../inference_outputs/baseline_7_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_7_balanced/val_auc/evaluation/individual-roc
 
 # Model: baseline_8_balanced
-python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_8_balanced/val_auc --batch-size 32 --trained-model-arch resnet152_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_8_balanced/best_model_dir-auc.ckpt --image-size 224 > ../logs/inference-baseline_8_balanced-val_auc.log 2>&1 &
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_8_balanced/val_auc --batch-size 32 --trained-model-arch resnet152_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_8_balanced/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_flat_all > ../logs/inference-baseline_8_balanced-val_auc.log 2>&1
 
 python compute_roc.py --preds-labels-file ../inference_outputs/baseline_8_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_8_balanced/val_auc/evaluation/individual-roc
 
 # Model: baseline_9_balanced
-python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_9_balanced/val_auc --batch-size 32 --trained-model-arch resnet152v2_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_9_balanced/best_model_dir-auc.ckpt --image-size 224 > ../logs/inference-baseline_9_balanced-val_auc.log 2>&1 &
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_9_balanced/val_auc --batch-size 32 --trained-model-arch resnet152v2_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_9_balanced/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_flat_all > ../logs/inference-baseline_9_balanced-val_auc.log 2>&1
 
 python compute_roc.py --preds-labels-file ../inference_outputs/baseline_9_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_9_balanced/val_auc/evaluation/individual-roc
 
+# Model: baseline_8_updated
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_8_updated/val_auc --batch-size 32 --trained-model-arch resnet152_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_8_updated/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_flat_all > ../logs/inference-baseline_8_updated-val_auc.log 2>&1
+
+python compute_roc.py --preds-labels-file ../inference_outputs/baseline_8_updated/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_8_updated/val_auc/evaluation/individual-roc
 
 ### Optical Flow.
 # Generate optical flow images [gpumachine-1]
@@ -206,3 +210,22 @@ python generate_optical_flow_images.py --metadata-file ../data/final_dataset_tra
 python generate_optical_flow_images.py --metadata-file ../data/final_dataset_val.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../../wellington_data/images-resized-224-opticalflow/ &  [DONE]
 
 python generate_optical_flow_images.py --metadata-file ../data/final_dataset_test.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../../wellington_data/images-resized-224-opticalflow/ &  [DONE]
+
+
+# XXX: Keep pushing this section towards the end. This summary might help later in future.
+### Learnings (include mistakes and self-realizations):
+- Adding channels helps in Improvements.
+- Weak label models can be still trained, but consider deep models with residual layers, like ResNet152. Also, not much differnce from V1 and V2 (ResNet), maybe V1 is better due to pre-activation while batch-norm. For weak label models, Average Pool may help better than dense layers.
+-  Optical flow Gunner Faurnebacks algorithm works great and similar to MOG2 background subtraction based motion detection for short sequences with objects moving in a relatively stationary environment.
+- Pretraining almost always helps, and can be loaded by altering the intial layer with just a few lines of code. Additional channels can be initialized with random weights (or maybe with pretrained weights as well as these initial kernels learn very simple features which could be meaningful for any kind of mask or channel information).
+- Be careful about 'training' argument in layers, and make sure that the inference is not run in training mode, as that leads to inconsistent predictions.
+- Never ever, Never ever ever use "[[]] * x" syntax to initialize. Python will take you down unconsciously with its reference copies. Use list comprehension instead of ensure reference copy is avoided.
+- Read TF and Keras documentation in detail, in all corners and crevices, they dont have good documentation. Also, consider reading their guides and examples before using.
+
+### Improvements to consider for future projects.
+# Code.
+- Models could be maintained in configs. Or the model functions could take kwargs to put similar model generation together.
+
+
+# Methods.
+- Each method needs to get its optimal hyperparams like patience, but that takes a lot of time.

@@ -54,7 +54,7 @@ def save_weights_resnet152_6channel(allpretrained=False):
     weights[0] = new_weights
 
     # Save the new weights
-    np.save(os.path.join("..", 'data', output_file_prefix + "_OFGF_weights.npy"), weights)
+    np.save(os.path.join("..", 'data', output_file_prefix + "_opticalflow_weights.npy"), weights)
 
 
 def save_weights_resnet152_15channel(allpretrained=False):
@@ -92,4 +92,4 @@ def save_weights_resnet152_15channel(allpretrained=False):
     weights[0] = new_weights
 
     # Save the new weights
-    np.save(os.path.join("..", 'data', output_file_prefix + "_OFGF_weights.npy"), weights)
+    np.save(os.path.join("..", 'data', output_file_prefix + "_opticalflow_weights.npy"), weights)

@@ -621,6 +621,162 @@ def resnet152_mask_pretrained_imagenet_lstm_custom_pool(input_shape, is_training
     return model
 
 
+def resnet152_6channel_opticalflow(input_shape, is_training=False, num_classes=1, learning_rate=0.001):
+    # XXX: Lots of redundant  code.
+    # This is the only line that changes.
+    model_name = "resnet152_6channel_opticalflow"
+
+    weights_file = os.path.join(os.getcwd(), "..", "data", "%s_weights.npy" % model_name)
+    url = "https://capstonestorageaccount.blob.core.windows.net/capstone-container/%s" % os.path.basename(weights_file)
+
+    # Check if the weights file is present else download it
+    if not os.path.isfile(weights_file):
+        wget.download(url, weights_file)
+
+    # Load the weights
+    weights = np.load(weights_file, allow_pickle=True)
+
+    # Build the model
+    inputs = tf.keras.Input(shape=input_shape, name='input')
+
+    model_pretrained_conv = tf.keras.applications.ResNet152(weights=None, include_top=False,  input_shape=input_shape)
+    model_pretrained_conv.set_weights(weights)
+    output_pretrained_conv = model_pretrained_conv(inputs, training=is_training)
+
+    avg_pool = tf.keras.layers.GlobalAveragePooling2D(name="avg_pool")(output_pretrained_conv)
+
+    if num_classes <= 2:
+        predictions = tf.keras.layers.Dense(1, activation="sigmoid", name="predictions")(avg_pool)
+        loss = tf.keras.losses.BinaryCrossentropy()
+    else:
+        predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(avg_pool)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
+
+    model = tf.keras.Model(inputs=inputs, outputs=predictions, name=model_name)
+    model.compile(optimizer=tf.keras.optimizers.Adam(lr=learning_rate),
+                  loss=loss,
+                  metrics=['accuracy', tf.keras.metrics.AUC(curve='ROC')])
+
+    return model
+
+
+def resnet152_6channel_allpretrained_opticalflow(input_shape, is_training=False, num_classes=1, learning_rate=0.001):
+    # XXX: Lots of redundant  code.
+    # This is the only line that changes.
+    model_name = "resnet152_6channel_allpretrained_opticalflow"
+
+    weights_file = os.path.join(os.getcwd(), "..", "data", "%s_weights.npy" % model_name)
+    url = "https://capstonestorageaccount.blob.core.windows.net/capstone-container/%s" % os.path.basename(weights_file)
+
+    # Check if the weights file is present else download it
+    if not os.path.isfile(weights_file):
+        wget.download(url, weights_file)
+
+    # Load the weights
+    weights = np.load(weights_file, allow_pickle=True)
+
+    # Build the model
+    inputs = tf.keras.Input(shape=input_shape, name='input')
+
+    model_pretrained_conv = tf.keras.applications.ResNet152(weights=None, include_top=False,  input_shape=input_shape)
+    model_pretrained_conv.set_weights(weights)
+    output_pretrained_conv = model_pretrained_conv(inputs, training=is_training)
+
+    avg_pool = tf.keras.layers.GlobalAveragePooling2D(name="avg_pool")(output_pretrained_conv)
+
+    if num_classes <= 2:
+        predictions = tf.keras.layers.Dense(1, activation="sigmoid", name="predictions")(avg_pool)
+        loss = tf.keras.losses.BinaryCrossentropy()
+    else:
+        predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(avg_pool)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
+
+    model = tf.keras.Model(inputs=inputs, outputs=predictions, name=model_name)
+    model.compile(optimizer=tf.keras.optimizers.Adam(lr=learning_rate),
+                  loss=loss,
+                  metrics=['accuracy', tf.keras.metrics.AUC(curve='ROC')])
+
+    return model
+
+
+def resnet152_15channel_opticalflow(input_shape, is_training=False, num_classes=1, learning_rate=0.001):
+    # XXX: Lots of redundant  code.
+    # This is the only line that changes.
+    model_name = "resnet152_15channel_opticalflow"
+
+    weights_file = os.path.join(os.getcwd(), "..", "data", "%s_weights.npy" % model_name)
+    url = "https://capstonestorageaccount.blob.core.windows.net/capstone-container/%s" % os.path.basename(weights_file)
+
+    # Check if the weights file is present else download it
+    if not os.path.isfile(weights_file):
+        wget.download(url, weights_file)
+
+    # Load the weights
+    weights = np.load(weights_file, allow_pickle=True)
+
+    # Build the model
+    inputs = tf.keras.Input(shape=input_shape, name='input')
+
+    model_pretrained_conv = tf.keras.applications.ResNet152(weights=None, include_top=False,  input_shape=input_shape)
+    model_pretrained_conv.set_weights(weights)
+    output_pretrained_conv = model_pretrained_conv(inputs, training=is_training)
+
+    avg_pool = tf.keras.layers.GlobalAveragePooling2D(name="avg_pool")(output_pretrained_conv)
+
+    if num_classes <= 2:
+        predictions = tf.keras.layers.Dense(1, activation="sigmoid", name="predictions")(avg_pool)
+        loss = tf.keras.losses.BinaryCrossentropy()
+    else:
+        predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(avg_pool)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
+
+    model = tf.keras.Model(inputs=inputs, outputs=predictions, name=model_name)
+    model.compile(optimizer=tf.keras.optimizers.Adam(lr=learning_rate),
+                  loss=loss,
+                  metrics=['accuracy', tf.keras.metrics.AUC(curve='ROC')])
+
+    return model
+
+
+def resnet152_15channel_allpretrained_opticalflow(input_shape, is_training=False, num_classes=1, learning_rate=0.001):
+    # XXX: Lots of redundant  code.
+    # This is the only line that changes.
+    model_name = "resnet152_15channel_allpretrained_opticalflow"
+
+    weights_file = os.path.join(os.getcwd(), "..", "data", "%s_weights.npy" % model_name)
+    url = "https://capstonestorageaccount.blob.core.windows.net/capstone-container/%s" % os.path.basename(weights_file)
+
+    # Check if the weights file is present else download it
+    if not os.path.isfile(weights_file):
+        wget.download(url, weights_file)
+
+    # Load the weights
+    weights = np.load(weights_file, allow_pickle=True)
+
+    # Build the model
+    inputs = tf.keras.Input(shape=input_shape, name='input')
+
+    model_pretrained_conv = tf.keras.applications.ResNet152(weights=None, include_top=False,  input_shape=input_shape)
+    model_pretrained_conv.set_weights(weights)
+    output_pretrained_conv = model_pretrained_conv(inputs, training=is_training)
+
+    avg_pool = tf.keras.layers.GlobalAveragePooling2D(name="avg_pool")(output_pretrained_conv)
+
+    if num_classes <= 2:
+        predictions = tf.keras.layers.Dense(1, activation="sigmoid", name="predictions")(avg_pool)
+        loss = tf.keras.losses.BinaryCrossentropy()
+    else:
+        predictions = layers.Dense(num_classes, activation="softmax", name="predictions")(avg_pool)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy()  # Note: one-hot labels are NOT required.
+
+    model = tf.keras.Model(inputs=inputs, outputs=predictions, name=model_name)
+    model.compile(optimizer=tf.keras.optimizers.Adam(lr=learning_rate),
+                  loss=loss,
+                  metrics=['accuracy', tf.keras.metrics.AUC(curve='ROC')])
+
+    return model
+
+
 # The dictionary mapping model names to model architecture functions.
 # Ensure that the name of the model architecture matches with the model's 'name' attribute.
 AVAILABLE_MODEL_ARCHS = {
@@ -648,6 +804,12 @@ AVAILABLE_MODEL_ARCHS = {
     # Mask-based models
     "resnet152_mask_pretrained_imagenet": resnet152_mask_pretrained_imagenet,
     "resnet152_mask_mog2_10channel_pretrained_imagenet": resnet152_mask_mog2_10channel_pretrained_imagenet
+
+    # OpticalFlow-based models.
+    "resnet152_6channel_opticalflow": resnet152_6channel_opticalflow,
+    "resnet152_6channel_allpretrained_opticalflow": resnet152_6channel_allpretrained_opticalflow,
+    "resnet152_15channel_opticalflow": resnet152_15channel_opticalflow,
+    "resnet152_15channel_allpretrained_opticalflow": resnet152_15channel_allpretrained_opticalflow
 }
 
 
