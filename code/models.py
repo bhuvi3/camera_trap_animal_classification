@@ -803,7 +803,7 @@ AVAILABLE_MODEL_ARCHS = {
     
     # Mask-based models
     "resnet152_mask_pretrained_imagenet": resnet152_mask_pretrained_imagenet,
-    "resnet152_mask_mog2_10channel_pretrained_imagenet": resnet152_mask_mog2_10channel_pretrained_imagenet
+    "resnet152_mask_mog2_10channel_pretrained_imagenet": resnet152_mask_mog2_10channel_pretrained_imagenet,
 
     # OpticalFlow-based models.
     "resnet152_6channel_opticalflow": resnet152_6channel_opticalflow,
