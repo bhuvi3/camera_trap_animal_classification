@@ -126,7 +126,7 @@ python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.
 
 python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_9_balanced --model-arch resnet152v2_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 10 --learning-rate 0.0001 --image-size 224 > ../logs/baseline_9_balanced.log 2>&1 & [gpumachine-3, COMPLETED]
 
-python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_8_updated --model-arch resnet152_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/baseline_8_updated.log 2>&1 & [gpumachine-3, IN PROCESS(91)]
+python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/baseline_8_updated --model-arch resnet152_pretrained_imagenet --data-pipeline-mode mode_flat_all --batch-size 32 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/baseline_8_updated.log 2>&1 & [gpumachine-3, COMPLETED]
 
 # -------------------
 # Darshan:
@@ -147,6 +147,18 @@ python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.
 python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/mask_MOG2_10channel_1/val_auc --batch-size 32 --trained-model-arch resnet152_mask_mog2_10channel_pretrained_imagenet --data-pipeline-mode mode_mask_mog2_multichannel --trained-checkpoint-dir ../trained_models/mask_MOG2_10channel_1/best_model_dir-auc.ckpt --image-size 224 > ../logs/inference-mask_MOG2_10channel_1-val_auc.log 2>&1 &
 
 python compute_roc.py --preds-labels-file ../inference_outputs/mask_MOG2_4channel_1/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/mask_MOG2_4channel_1/val_auc/evaluation/individual-roc
+
+# Train Optical Flow based models.
+# Trial
+python train_pipeline.py --train-meta-file ../data/final_dataset_train-trial.csv --val-meta-file ../data/final_dataset_val-trial.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflow_6channel_1-trial --model-arch resnet152_6channel_opticalflow --data-pipeline-mode mode_opticalflow_single --num-channels 6 --batch-size 8 --epochs 1 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005
+
+python train_pipeline.py --train-meta-file ../data/final_dataset_train-trial.csv --val-meta-file ../data/final_dataset_val-trial.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflow_6channel_allpretrained_1-trial --model-arch resnet152_6channel_allpretrained_opticalflow --data-pipeline-mode mode_opticalflow_single --num-channels 6 --batch-size 8 --epochs 1 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005
+
+# Model: opticalflow_6channel_1
+python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflow_6channel_1 --model-arch resnet152_6channel_opticalflow --data-pipeline-mode mode_opticalflow_single --num-channels 6 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/opticalflow_6channel_1.log 2>&1 & [gpumachine-2, IN PROCSESS(358)]
+
+# Model: opticalflow_6channel_allpretrained_1
+python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflow_6channel_allpretrained_1 --model-arch resnet152_6channel_allpretrained_opticalflow --data-pipeline-mode mode_opticalflow_single --num-channels 6 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/opticalflow_6channel_allpretrained_1.log 2>&1 & [gpumachine-3, IN PROCESS(291)]
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -210,6 +222,10 @@ python generate_optical_flow_images.py --metadata-file ../data/final_dataset_tra
 python generate_optical_flow_images.py --metadata-file ../data/final_dataset_val.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../../wellington_data/images-resized-224-opticalflow/ &  [DONE]
 
 python generate_optical_flow_images.py --metadata-file ../data/final_dataset_test.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../../wellington_data/images-resized-224-opticalflow/ &  [DONE]
+
+
+
+
 
 
 # XXX: Keep pushing this section towards the end. This summary might help later in future.
