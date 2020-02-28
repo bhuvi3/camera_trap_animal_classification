@@ -307,7 +307,7 @@ def inference_pipeline(test_metadata_file_path,
     if is_sequence_model:
         pred_labels = []
     else:  # If single-image based models are running, run inference on each image.
-        pred_labels = [[]] * sequence_image_count
+        pred_labels = [[] for _ in range(sequence_image_count)]
 
     for test_batch in test_dataset_batches:
         test_sequences, test_labels = test_batch
@@ -324,6 +324,12 @@ def inference_pipeline(test_metadata_file_path,
     time_taken = end_time - start_time
     print("Running inference on the test set has completed in %s seconds on the test set metadata file: %s"
           % (time_taken, test_metadata_file_path))
+
+    print("Asserting the number of pred_labels found.")
+    if is_sequence_model:
+        assert len(pred_labels) == num_test_sequences
+    else:
+        assert len(pred_labels[0]) == num_test_sequences
 
     # Save the pred labels to a pickle file.
     if is_sequence_model:
