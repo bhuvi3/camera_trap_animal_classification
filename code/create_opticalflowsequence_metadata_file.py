@@ -23,7 +23,7 @@ def create_optical_flow_metadata_file(src_metadata_file_path):
 if __name__ == "__main__":
     src_metadata_files = [
         "../data/final_dataset_train_balanced.csv",
-        "../data/final_dataset_val_balanced.csv"
+        "../data/final_dataset_val_balanced.csv",
         "../data/final_dataset_test_balanced-shuffled.csv"
     ]
     for src_metadata_file in src_metadata_files:
