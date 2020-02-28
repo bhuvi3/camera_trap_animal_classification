@@ -63,6 +63,14 @@ def get_args():
                         type=int,
                         default=224,
                         help="The length of the side for the 'square' images present in the images-dir. Default: 224.")
+    parser.add_argument('--sequence-image-count',
+                        type=int,
+                        default=3,
+                        help="The number of images in the sequence which needs to be input across time-steps. Default: 3.")
+    parser.add_argument('--num-channels',
+                        type=int,
+                        default=3,
+                        help="The number of input channels expected by the data pipeline. Default: 3.")
 
     args = parser.parse_args()
 
@@ -159,8 +167,8 @@ def train(train_metadata_file_path,
                                                        patience=early_stop_patience)
 
 
-    #We use the HDF5 method to store the sequence models due to a bug in tensorflow TimeDistributed wrapper
-    if data_pipeline_mode == 'mode_sequence' or data_pipeline_mode == 'mode_mask_mog2_sequence':
+    # XXX: We use the HDF5 method to store the sequence models due to a bug in tensorflow TimeDistributed wrapper
+    if data_pipeline_mode in PipelineGenerator.TIMESTEP_MODES:
         model_extension = ".h5"
     else:
         model_extension = ".ckpt"
@@ -231,16 +239,18 @@ if __name__ == "__main__":
 
     num_classes = 1
     label_name = "has_animal"
-    sequence_image_count = 3
 
-    if args.data_pipeline_mode == PipelineGenerator.MODE_SEQUENCE:
-        input_size = (sequence_image_count, args.image_size, args.image_size, 3)
-    elif args.data_pipeline_mode == PipelineGenerator.MODE_MASK_MOG2_SINGLE:
-        input_size = (args.image_size, args.image_size, 4)
-    elif args.data_pipeline_mode == PipelineGenerator.MODE_MASK_MOG2_MULTICHANNEL:
-        input_size = (args.image_size, args.image_size, 10)
+    # Default num_channels for backward compatibility.
+    if not args.num_channels:
+        if args.data_pipeline_mode == PipelineGenerator.MODE_MASK_MOG2_SINGLE:
+            args.num_channels = 4
+        if args.data_pipeline_mode == PipelineGenerator.MODE_MASK_MOG2_MULTICHANNEL:
+            args.num_channels = 10
+
+    if args.data_pipeline_mode in PipelineGenerator.TIMESTEP_MODES:
+        input_size = (args.sequence_image_count, args.image_size, args.image_size, args.num_channels)
     else:
-        input_size = (args.image_size, args.image_size, 3)
+        input_size = (args.image_size, args.image_size, args.num_channels)
 
     train(args.train_meta_file,
           args.val_meta_file,
@@ -249,7 +259,7 @@ if __name__ == "__main__":
           args.model_arch,
           num_classes,
           label_name=label_name,
-          sequence_image_count=sequence_image_count,
+          sequence_image_count=args.sequence_image_count,
           data_pipeline_mode=args.data_pipeline_mode,
           class_weight=None,
           whole_epochs=args.epochs,

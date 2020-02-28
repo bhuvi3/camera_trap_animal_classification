@@ -81,22 +81,29 @@ class PipelineGenerator(object):
                                  along the depth channel.
             
     """
-    
+    # Mode declarations.
     MODE_ALL = "mode_all"
+
+    # Modes for single-image models.
     MODE_FLAT_ALL = "mode_flat_all"
     MODE_SINGLE = "mode_single"
+
+    SINGLE_IMAGE_MODES = [MODE_SINGLE, MODE_FLAT_ALL]
+
+    # Modes for models which use sequence information in some way.
     MODE_SEQUENCE = "mode_sequence"
     MODE_MASK_MOG2_SINGLE = "mode_mask_mog2_single"
     MODE_MASK_MOG2_SEQUENCE = "mode_mask_mog2_sequence"
     MODE_MASK_MOG2_MULTICHANNEL = "mode_mask_mog2_multichannel"
-    
-    MASK_MODES = [MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_SEQUENCE, 
-                  MODE_MASK_MOG2_MULTICHANNEL]
-    SEQUENCE_MODES = [MODE_SEQUENCE, MODE_MASK_MOG2_SEQUENCE, 
-                      MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_MULTICHANNEL]
-    VALID_MODES = [MODE_ALL, MODE_FLAT_ALL, MODE_SINGLE, MODE_SEQUENCE, 
-                   MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_SEQUENCE, 
-                   MODE_MASK_MOG2_MULTICHANNEL]
+
+    SEQUENCE_MODES = [MODE_SEQUENCE, MODE_MASK_MOG2_SEQUENCE, MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_MULTICHANNEL]
+
+    # Modes which utilize time-step, i.e., which take additional time-step dimensions like (None, 3, 224, 224, 3).
+    TIMESTEP_MODES = [MODE_SEQUENCE, MODE_MASK_MOG2_SEQUENCE]
+
+    VALID_MODES = [MODE_ALL, MODE_FLAT_ALL, MODE_SINGLE,
+                   MODE_SEQUENCE,
+                   MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_SEQUENCE, MODE_MASK_MOG2_MULTICHANNEL]
     
     def __init__(self, dataset_file, images_dir, sequence_image_count=3,
                  label_name='has_animal', mode=MODE_ALL, image_size=(224, 224),
@@ -232,7 +239,7 @@ class PipelineGenerator(object):
             img = tf.image.resize(img, list(self._resize), name="resize-input")
 
         return img
-    
+
     
     def _parse_data_all(self, metadata, label):
         data_point = {}

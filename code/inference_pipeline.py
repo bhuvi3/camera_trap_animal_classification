@@ -24,9 +24,6 @@ import tensorflow as tf
 import time
 
 
-SEQUENCE_LENGTH = 3
-
-
 def get_args():
     parser = argparse.ArgumentParser(description="Run model inference and  evaluation on the given test set.")
 
@@ -64,6 +61,14 @@ def get_args():
                         type=int,
                         default=224,
                         help="The length of the side for the 'square' images present in the images-dir. Default: 224.")
+    parser.add_argument('--sequence-image-count',
+                        type=int,
+                        default=3,
+                        help="The number of images in the sequence which needs to be input across time-steps. Default: 3.")
+    parser.add_argument('--num-channels',
+                        type=int,
+                        default=3,
+                        help="The number of input channels expected by the data pipeline. Default: 3.")
 
     args = parser.parse_args()
 
@@ -219,7 +224,7 @@ def inference_pipeline(test_metadata_file_path,
                        filetype,
                        num_classes,
                        label_name=None,
-                       sequence_image_count=1,
+                       sequence_image_count=3,
                        data_pipeline_mode="mode_flat_all",
                        batch_size=32,
                        input_size=(224, 224, 3),
@@ -236,7 +241,7 @@ def inference_pipeline(test_metadata_file_path,
     :param filetype: The type of saved model used, select from ['.h5', 'tf']. Default: 'tf'.
     :param num_classes: The number of classes.
     :param label_name: The name of the label column in the metadata csv file.
-    :param sequence_image_count: The number of images in the sequence dataset. Default: 1.
+    :param sequence_image_count: The number of images in the sequence dataset. Default: 3.
     :param is_sequence_model: Specify True if this is a sequence-based model. Default False.
     :param batch_size: The batch size used for the data. Ensure that it fits within the GPU memory. Default: 32.
     :param input_size: The shape of the tensors returned by the data pipeline mode. Default: (224, 224, 3).
@@ -270,12 +275,15 @@ def inference_pipeline(test_metadata_file_path,
     os.makedirs(out_dir)
     shutil.copy(test_metadata_file_path, os.path.join(out_dir, os.path.basename(test_metadata_file_path)))
 
+    # Infer if the architecture works with sequence of images
+    is_sequence_model = data_pipeline_mode not in PipelineGenerator.SINGLE_IMAGE_MODES
+
     # Load the test data pipeline.
-    if data_pipeline_mode in PipelineGenerator.SEQUENCE_MODES:
+    if is_sequence_model:  # For all models which use sequence information in some way, use respective modes.
         pipeline_mode = data_pipeline_mode
-    else:
+    else:  # For single-image models, use the MODE_SEQUENCE, and infer on each individual image.
         pipeline_mode = PipelineGenerator.MODE_SEQUENCE
-    
+
     pipeline_gen = PipelineGenerator(test_metadata_file_path,
                                      images_dir_path,
                                      is_training=False,
@@ -287,9 +295,6 @@ def inference_pipeline(test_metadata_file_path,
     test_dataset_batches = test_dataset_raw.batch(batch_size).prefetch(tf.data.experimental.AUTOTUNE)
     num_test_sequences = pipeline_gen.get_size()
     print("There are %s test sequences." % num_test_sequences)
-    
-    # Infer if the architecture works with sequence of images
-    is_sequence_model = (data_pipeline_mode in PipelineGenerator.SEQUENCE_MODES)
 
     # Create the model architecture and load the trained weights from checkpoint dir.
     model = load_and_get_model_for_inference(trained_model_arch, trained_checkpoint_dir, filetype, input_size, num_classes)
@@ -301,7 +306,7 @@ def inference_pipeline(test_metadata_file_path,
     start_time = time.time()
     if is_sequence_model:
         pred_labels = []
-    else:
+    else:  # If single-image based models are running, run inference on each image.
         pred_labels = [[]] * sequence_image_count
 
     for test_batch in test_dataset_batches:
@@ -323,7 +328,7 @@ def inference_pipeline(test_metadata_file_path,
     # Save the pred labels to a pickle file.
     if is_sequence_model:
         pred_label_output_path = os.path.join(out_dir, "pred_labels-sequence.pickle")
-    else:
+    else:  # If single-image based models are running, run inference on each image.
         pred_label_output_path = os.path.join(out_dir, "pred_labels-individual.pickle")
     with open(pred_label_output_path, "wb") as fp:
         pickle.dump(pred_labels, fp)
@@ -363,16 +368,18 @@ if __name__ == "__main__":
 
     num_classes = 1
     label_name = "has_animal"
-    sequence_image_count = 3
 
-    if args.data_pipeline_mode == PipelineGenerator.MODE_SEQUENCE:
-        input_size = (sequence_image_count, args.image_size, args.image_size, 3)
-    elif args.data_pipeline_mode == PipelineGenerator.MODE_MASK_MOG2_SINGLE:
-        input_size = (args.image_size, args.image_size, 4)
-    elif args.data_pipeline_mode == PipelineGenerator.MODE_MASK_MOG2_MULTICHANNEL:
-        input_size = (args.image_size, args.image_size, 10)
+    # Default num_channels for backward compatibility.
+    if not args.num_channels:
+        if args.data_pipeline_mode == PipelineGenerator.MODE_MASK_MOG2_SINGLE:
+            args.num_channels = 4
+        if args.data_pipeline_mode == PipelineGenerator.MODE_MASK_MOG2_MULTICHANNEL:
+            args.num_channels = 10
+
+    if args.data_pipeline_mode in PipelineGenerator.TIMESTEP_MODES:
+        input_size = (args.sequence_image_count, args.image_size, args.image_size, args.num_channels)
     else:
-        input_size = (args.image_size, args.image_size, 3)
+        input_size = (args.image_size, args.image_size, args.num_channels)
 
     inference_pipeline(args.test_meta_file,
                        args.images_dir,
@@ -382,7 +389,7 @@ if __name__ == "__main__":
                        args.filetype,
                        num_classes,
                        label_name=label_name,
-                       sequence_image_count=sequence_image_count,
+                       sequence_image_count=args.sequence_image_count,
                        data_pipeline_mode=args.data_pipeline_mode,
                        batch_size=args.batch_size,
                        input_size=input_size,
