@@ -29,8 +29,9 @@ def create_optical_flow_metadata_file(src_metadata_file_path):
     data_df["opticalflowGF_average"] = data_df["sequence"].astype(str) + "_opticalflowGF_average.png"
 
     # Save the new metadata file.
-    data_df.to_csv(src_metadata_file_path, index=False)
-    print("Optical Flow Sequence metadata file has been overwritten to %s" % src_metadata_file_path)
+    dest_metadata_file_path = "-updated_opticalflow".join(os.path.splitext(src_metadata_file_path))
+    data_df.to_csv(dest_metadata_file_path, index=False)
+    print("Optical Flow Sequence metadata file has been written to %s" % dest_metadata_file_path)
 
 if __name__ == "__main__":
     src_metadata_files = [
