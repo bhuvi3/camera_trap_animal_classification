@@ -11,7 +11,7 @@ def create_optical_flow_metadata_file(src_metadata_file_path):
 
     # Create: image2 as <sequence_opticalflowGF_1.png>, and image4 as <sequence__opticalflowGF_2.png>
     data_df["image2"] = data_df["sequence"].astype(str) + "_opticalflowGF_1.png"
-    data_df["image4"] = data_df["sequence"].astype(str) + "_opticalflowGF_1.png"
+    data_df["image4"] = data_df["sequence"].astype(str) + "_opticalflowGF_2.png"
     data_df_selected = data_df[["sequence", "image1", "image2", "image3", "image4", "image5", "mask_MOG2", "has_animal"]]
 
     # Save the new metadata file.
