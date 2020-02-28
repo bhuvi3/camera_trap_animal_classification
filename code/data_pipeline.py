@@ -139,25 +139,21 @@ class PipelineGenerator(object):
         
         if self._resize:
             self._image_size = self._resize
+            
+        self._parser_map = {
+            self.MODE_ALL: self._parse_data_all,
+            self.MODE_FLAT_ALL: self._parse_data_flat,
+            self.MODE_SEQUENCE: self._parse_data_sequence,
+            self.MODE_MASK_MOG2_SINGLE: self._parse_data_mask_mog2_single,
+            self.MODE_MASK_MOG2_SEQUENCE: self._parse_data_mask_mog2_sequence,
+            self.MODE_MASK_MOG2_MULTICHANNEL: self._parse_data_mask_mog2_multichannel,
+            self.MODE_OPTICALFLOW_SINGLE: self._parse_data_opticalflow_single,
+            self.MODE_OPTICALFLOW_MULTICHANNEL: self._parse_data_opticalflow_multichannel,
+            self.MODE_SINGLE: self._parse_data_single
+        }
         
-        if self._mode == self.MODE_ALL:
-            self._parse_data = self._parse_data_all
-        elif self._mode == self.MODE_FLAT_ALL:
-            self._parse_data = self._parse_data_flat
-        elif self._mode == self.MODE_SEQUENCE:
-            self._parse_data = self._parse_data_sequence
-        elif self._mode == self.MODE_MASK_MOG2_SINGLE:
-            self._parse_data = self._parse_data_mask_mog2_single
-        elif self._mode == self.MODE_MASK_MOG2_SEQUENCE:
-            self._parse_data = self._parse_data_mask_mog2_sequence
-        elif self._mode == self.MODE_MASK_MOG2_MULTICHANNEL:
-            self._parse_data = self._parse_data_mask_mog2_multichannel
-        elif self._mode == self.MODE_OPTICALFLOW_SINGLE:
-            self._parse_data = self._parse_data_opticalflow_single
-        elif self._mode == self.MODE_OPTICALFLOW_MULTICHANNEL:
-            self._parse_data = self._parse_data_opticalflow_multichannel
-        else:
-            self._parse_data = self._parse_data_single
+        self._parse_data = self._parser_map[self._mode]
+
 
 
     def _augment_img(self, img, seed, should_skip_color_aug=False):
