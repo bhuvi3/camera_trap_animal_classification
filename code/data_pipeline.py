@@ -441,7 +441,7 @@ class PipelineGenerator(object):
             self._size = self._size * self._sequence_image_count
 
         image_col_names = ["image" + str(img_num) for img_num in range(1, self._sequence_image_count + 1)]
-        mask_columns = [mask_col for mask_col in data_csv.columns if mask_col.startswith('mask')]
+        mask_columns = [mask_col for mask_col in data_csv.columns if (mask_col.startswith('mask') or mask_col.startswith('opticalflow'))]
         image_col_names.extend(mask_columns)
         labels = data_csv[[self._label_name]]
         file_paths = data_csv[image_col_names]
