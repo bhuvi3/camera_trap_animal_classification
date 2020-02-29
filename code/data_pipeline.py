@@ -98,9 +98,12 @@ class PipelineGenerator(object):
     MODE_OPTICALFLOW_SINGLE = "mode_opticalflow_single"
     MODE_OPTICALFLOW_MULTICHANNEL = "mode_opticalflow_multichannel"
     # MODE_OPTICALFLOW_SEQUENCE maybe added in future. But a different vesion is being run with MODE_SEQUENCE itself.
+    MODE_HYBRID_13CHANNEL = "mode_hybrid_13channel"
+    MODE_HYBRID_16CHANNEL = "mode_hybrid_16channel"
 
     SEQUENCE_MODES = [MODE_SEQUENCE, MODE_MASK_MOG2_SEQUENCE, MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_MULTICHANNEL,
-                      MODE_OPTICALFLOW_SINGLE, MODE_OPTICALFLOW_MULTICHANNEL]
+                      MODE_OPTICALFLOW_SINGLE, MODE_OPTICALFLOW_MULTICHANNEL,
+                      MODE_HYBRID_13CHANNEL, MODE_HYBRID_16CHANNEL]
 
     # Modes which utilize time-step, i.e., which take additional time-step dimensions like (None, 3, 224, 224, 3).
     TIMESTEP_MODES = [MODE_SEQUENCE, MODE_MASK_MOG2_SEQUENCE]
@@ -108,7 +111,8 @@ class PipelineGenerator(object):
     VALID_MODES = [MODE_ALL, MODE_FLAT_ALL, MODE_SINGLE,
                    MODE_SEQUENCE,
                    MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_SEQUENCE, MODE_MASK_MOG2_MULTICHANNEL,
-                   MODE_OPTICALFLOW_SINGLE, MODE_OPTICALFLOW_MULTICHANNEL]
+                   MODE_OPTICALFLOW_SINGLE, MODE_OPTICALFLOW_MULTICHANNEL,
+                   MODE_HYBRID_13CHANNEL, MODE_HYBRID_16CHANNEL]
     
     def __init__(self, dataset_file, images_dir, sequence_image_count=3,
                  label_name='has_animal', mode=MODE_ALL, image_size=(224, 224),
@@ -149,6 +153,8 @@ class PipelineGenerator(object):
             self.MODE_MASK_MOG2_MULTICHANNEL: self._parse_data_mask_mog2_multichannel,
             self.MODE_OPTICALFLOW_SINGLE: self._parse_data_opticalflow_single,
             self.MODE_OPTICALFLOW_MULTICHANNEL: self._parse_data_opticalflow_multichannel,
+            self.MODE_HYBRID_13CHANNEL: self._parse_data_hybrid_13channel,
+            self.MODE_HYBRID_16CHANNEL: self._parse_data_hybrid_16channel,
             self.MODE_SINGLE: self._parse_data_single
         }
         
@@ -409,6 +415,63 @@ class PipelineGenerator(object):
             img = self._decode_img(img)
             img = self._augment_img(img, seed, should_skip_color_aug=should_skip_color_aug)
             images.append(img)
+
+        # Append all the images and the mask
+        final_image = tf.concat(images, axis=2)
+        return final_image, label
+
+    def _parse_data_hybrid_13channel(self, metadata, label):
+        images = []
+        seed = np.random.randint(1000)
+
+        # Read each image, augment it and add it to the list
+        for img_num in range(1, self._sequence_image_count + 1):
+            img = tf.io.read_file(tf.strings.join([self._images_dir, metadata["image" + str(img_num)]]))
+            img = self._decode_img(img)
+            img = self._augment_img(img, seed)
+            images.append(img)
+
+        # Read and augment the OpticalFlow-Average. Add it to the list
+        opticalflow_avg = tf.io.read_file(tf.strings.join([self._images_dir, metadata['opticalflowGF_average']]))
+        opticalflow_avg = self._decode_img(opticalflow_avg)
+        opticalflow_avg = self._augment_img(opticalflow_avg, seed, should_skip_color_aug=True)
+        images.append(opticalflow_avg)
+
+        # Read and augment the mask. Add it to the list
+        mask = tf.io.read_file(tf.strings.join([self._images_dir, metadata['mask_MOG2']]))
+        mask = self._decode_img(mask, is_mask=True)
+        mask = self._augment_img(mask, seed, should_skip_color_aug=True)
+        images.append(mask)
+
+        # Append all the images and the mask
+        final_image = tf.concat(images, axis=2)
+        return final_image, label
+
+    def _parse_data_hybrid_16channel(self, metadata, label):
+        # Note: Provide 'sequence_image_count' as the number of original images, and do not include
+        # opticalflow images in it, but provide the right number of channels.
+        # List of tuples: [(image_column_name, flag)]
+        # The flag determines if the image should_skip_color_aug (mask/optical flow type of image).
+        image_names_should_skip_color_aug_flags = []
+        for i in range(1, self._sequence_image_count):  # Skip the last image.
+            image_names_should_skip_color_aug_flags.append(("image" + str(i), False))
+            image_names_should_skip_color_aug_flags.append(("opticalflowGF_" + str(i), True))  # Need to skip color aug, as this is opticalflow.
+        image_names_should_skip_color_aug_flags.append(("image" + str(self._sequence_image_count), False))  # Include last image here.
+
+        # Read each image, augment it if it not opticalflow image and add it to the list.
+        images = []
+        seed = np.random.randint(1000)
+        for column_name, should_skip_color_aug in image_names_should_skip_color_aug_flags:
+            img = tf.io.read_file(tf.strings.join([self._images_dir, metadata[column_name]]))
+            img = self._decode_img(img)
+            img = self._augment_img(img, seed, should_skip_color_aug=should_skip_color_aug)
+            images.append(img)
+
+        # Read and augment the mask. Add it to the list
+        mask = tf.io.read_file(tf.strings.join([self._images_dir, metadata['mask_MOG2']]))
+        mask = self._decode_img(mask, is_mask=True)
+        mask = self._augment_img(mask, seed, should_skip_color_aug=True)
+        images.append(mask)
 
         # Append all the images and the mask
         final_image = tf.concat(images, axis=2)
