@@ -155,10 +155,17 @@ python train_pipeline.py --train-meta-file ../data/final_dataset_train-trial.csv
 python train_pipeline.py --train-meta-file ../data/final_dataset_train-trial.csv --val-meta-file ../data/final_dataset_val-trial.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflow_6channel_allpretrained_1-trial --model-arch resnet152_6channel_allpretrained_opticalflow --data-pipeline-mode mode_opticalflow_single --num-channels 6 --batch-size 8 --epochs 1 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005
 
 # Model: opticalflow_6channel_1
-python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflow_6channel_1 --model-arch resnet152_6channel_opticalflow --data-pipeline-mode mode_opticalflow_single --num-channels 6 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/opticalflow_6channel_1.log 2>&1 & [gpumachine-2, IN PROCSESS(358)]
+python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflow_6channel_1 --model-arch resnet152_6channel_opticalflow --data-pipeline-mode mode_opticalflow_single --num-channels 6 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/opticalflow_6channel_1.log 2>&1 & [gpumachine-2, COMPLETED]
 
 # Model: opticalflow_6channel_allpretrained_1
-python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflow_6channel_allpretrained_1 --model-arch resnet152_6channel_allpretrained_opticalflow --data-pipeline-mode mode_opticalflow_single --num-channels 6 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/opticalflow_6channel_allpretrained_1.log 2>&1 & [gpumachine-3, IN PROCESS(291)]
+python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflow_6channel_allpretrained_1 --model-arch resnet152_6channel_allpretrained_opticalflow --data-pipeline-mode mode_opticalflow_single --num-channels 6 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/opticalflow_6channel_allpretrained_1.log 2>&1 & [gpumachine-3, COMPLETED]
+
+# Model: opticalflow_15channel_1
+python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflow_15channel_1 --model-arch resnet152_15channel_opticalflow --data-pipeline-mode mode_opticalflow_multichannel --num-channels 15 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/opticalflow_15channel_1.log 2>&1 & [gpumachine-2, TODO]
+
+# Model: opticalflow_15channel_allpretrained_1
+python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflow_15channel_allpretrained_1 --model-arch resnet152_15channel_allpretrained_opticalflow --data-pipeline-mode mode_opticalflow_multichannel --num-channels 15 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/opticalflow_15channel_allpretrained_1.log 2>&1 & [gpumachine-3, TODO]
+
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -210,10 +217,35 @@ python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balance
 
 python compute_roc.py --preds-labels-file ../inference_outputs/baseline_9_balanced/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_9_balanced/val_auc/evaluation/individual-roc
 
+
 # Model: baseline_8_updated
 python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/baseline_8_updated/val_auc --batch-size 32 --trained-model-arch resnet152_pretrained_imagenet --trained-checkpoint-dir ../trained_models/baseline_8_updated/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_flat_all > ../logs/inference-baseline_8_updated-val_auc.log 2>&1
 
 python compute_roc.py --preds-labels-file ../inference_outputs/baseline_8_updated/val_auc/pred_labels-individual.pickle --out-file ../inference_outputs/baseline_8_updated/val_auc/evaluation/individual-roc
+
+
+#------
+# Model: mask_MOG2_4channel_1
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/mask_MOG2_4channel_1/val_auc --batch-size 16 --trained-model-arch resnet152_mask_pretrained_imagenet --trained-checkpoint-dir ../trained_models/mask_MOG2_4channel_1/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_mask_mog2_single --num-channels 4 > ../logs/inference-mask_MOG2_4channel_1-val_auc.log 2>&1
+
+# Model: mask_MOG2_10channel_1
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/mask_MOG2_10channel_1/val_auc --batch-size 16 --trained-model-arch resnet152_mask_mog2_10channel_pretrained_imagenet --trained-checkpoint-dir ../trained_models/mask_MOG2_10channel_1/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_mask_mog2_multichannel --num-channels 10 > ../logs/inference-mask_MOG2_10channel_1-val_auc.log 2>&1
+
+
+#------
+# Model: opticalflow_6channel_1
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/opticalflow_6channel_1/val_auc --batch-size 16 --trained-model-arch resnet152_6channel_opticalflow --trained-checkpoint-dir ../trained_models/opticalflow_6channel_1/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_opticalflow_single --num-channels 6 > ../logs/inference-opticalflow_6channel_1-val_auc.log 2>&1
+
+# Model: opticalflow_6channel_allpretrained_1
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/opticalflow_6channel_allpretrained_1/val_auc --batch-size 16 --trained-model-arch resnet152_6channel_allpretrained_opticalflow --trained-checkpoint-dir ../trained_models/opticalflow_6channel_allpretrained_1/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_opticalflow_single --num-channels 6 > ../logs/inference-opticalflow_6channel_allpretrained_1-val_auc.log 2>&1
+
+# Model: opticalflow_15channel_1
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/opticalflow_15channel_1/val_auc --batch-size 16 --trained-model-arch resnet152_15channel_opticalflow --trained-checkpoint-dir ../trained_models/opticalflow_15channel_1/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_opticalflow_multichannel --num-channels 6 > ../logs/inference-opticalflow_15channel_1-val_auc.log 2>&1
+
+# Model: opticalflow_15channel_allpretrained_1
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/opticalflow_15channel_allpretrained_1/val_auc --batch-size 16 --trained-model-arch resnet152_15channel_allpretrained_opticalflow --trained-checkpoint-dir ../trained_models/opticalflow_15channel_allpretrained_1/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_opticalflow_multichannel --num-channels 6 > ../logs/inference-opticalflow_15channel_allpretrained_1-val_auc.log 2>&1
+
+
 
 ### Optical Flow.
 # Generate optical flow images [gpumachine-1]
