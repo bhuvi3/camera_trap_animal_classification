@@ -161,11 +161,17 @@ python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.
 python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflow_6channel_allpretrained_1 --model-arch resnet152_6channel_allpretrained_opticalflow --data-pipeline-mode mode_opticalflow_single --num-channels 6 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/opticalflow_6channel_allpretrained_1.log 2>&1 & [gpumachine-3, COMPLETED]
 
 # Model: opticalflow_15channel_1
-python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflow_15channel_1 --model-arch resnet152_15channel_opticalflow --data-pipeline-mode mode_opticalflow_multichannel --num-channels 15 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/opticalflow_15channel_1.log 2>&1 & [gpumachine-2, IN PROCESS(527)]
+python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflow_15channel_1 --model-arch resnet152_15channel_opticalflow --data-pipeline-mode mode_opticalflow_multichannel --num-channels 15 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/opticalflow_15channel_1.log 2>&1 & [gpumachine-2, COMPLETED]
 
 # Model: opticalflow_15channel_allpretrained_1
-python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflow_15channel_allpretrained_1 --model-arch resnet152_15channel_allpretrained_opticalflow --data-pipeline-mode mode_opticalflow_multichannel --num-channels 15 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/opticalflow_15channel_allpretrained_1.log 2>&1 & [gpumachine-3, IN PROCESS(452)]
+python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflow_15channel_allpretrained_1 --model-arch resnet152_15channel_allpretrained_opticalflow --data-pipeline-mode mode_opticalflow_multichannel --num-channels 15 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/opticalflow_15channel_allpretrained_1.log 2>&1 & [gpumachine-3, COMPLETED]
 
+# Train Hybrid Models.
+# Model: hybrid_13channel_1
+python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/hybrid_13channel_1 --model-arch resnet152_13channel_hybrid --data-pipeline-mode mode_hybrid_13channel --num-channels 13 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/hybrid_13channel_1.log 2>&1 & [gpumachine-2, TODO]
+
+# Model: hybrid_16channel_1
+python train_pipeline.py --train-meta-file ../data/final_dataset_train_balanced.csv --val-meta-file ../data/final_dataset_val_balanced.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/hybrid_16channel_1 --model-arch resnet152_16channel_hybrid --data-pipeline-mode mode_hybrid_16channel --num-channels 16 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/hybrid_16channel_1.log 2>&1 & [gpumachine-3, TODO]
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -245,6 +251,12 @@ python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balance
 # Model: opticalflow_15channel_allpretrained_1
 python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/opticalflow_15channel_allpretrained_1/val_auc --batch-size 16 --trained-model-arch resnet152_15channel_allpretrained_opticalflow --trained-checkpoint-dir ../trained_models/opticalflow_15channel_allpretrained_1/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_opticalflow_multichannel --num-channels 15 > ../logs/inference-opticalflow_15channel_allpretrained_1-val_auc.log 2>&1
 
+#------
+# Model: hybrid_13channel_1
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/hybrid_13channel_1/val_auc --batch-size 16 --trained-model-arch resnet152_13channel_hybrid --trained-checkpoint-dir ../trained_models/hybrid_13channel_1/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_hybrid_13channel --num-channels 15 > ../logs/inference-hybrid_13channel_1-val_auc.log 2>&1
+
+# Model: hybrid_16channel_1
+python inference_pipeline.py --test-meta-file ../data/final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/hybrid_16channel_1/val_auc --batch-size 16 --trained-model-arch resnet152_16channel_hybrid --trained-checkpoint-dir ../trained_models/hybrid_16channel_1/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_hybrid_16channel --num-channels 15 > ../logs/inference-hybrid_16channel_1-val_auc.log 2>&1
 
 
 ### Optical Flow.
