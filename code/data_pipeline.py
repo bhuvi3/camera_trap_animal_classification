@@ -96,14 +96,18 @@ class PipelineGenerator(object):
     MODE_MASK_MOG2_SEQUENCE = "mode_mask_mog2_sequence"
     MODE_MASK_MOG2_MULTICHANNEL = "mode_mask_mog2_multichannel"
     MODE_OPTICALFLOW_SINGLE = "mode_opticalflow_single"
-    MODE_OPTICALFLOW_MULTICHANNEL = "mode_opticalflow_multichannel"
-    # MODE_OPTICALFLOW_SEQUENCE maybe added in future. But a different vesion is being run with MODE_SEQUENCE itself.
+    MODE_OPTICALFLOW_MULTICHANNEL = "mode_opticalflow_multichannel"  # MODE_OPTICALFLOW_SEQUENCE maybe added in future.
+                                                                     # But a different vesion is being run with MODE_SEQUENCE itself.
     MODE_HYBRID_13CHANNEL = "mode_hybrid_13channel"
     MODE_HYBRID_16CHANNEL = "mode_hybrid_16channel"
 
+    MODE_OPTICALFLOWONLY_6CHANNEL = "mode_opticalflowonly_6channel"
+    MODE_MASKOPTICALFLOWONLY_7CHANNEL = "mode_maskopticalflowonly_7channel"
+
     SEQUENCE_MODES = [MODE_SEQUENCE, MODE_MASK_MOG2_SEQUENCE, MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_MULTICHANNEL,
                       MODE_OPTICALFLOW_SINGLE, MODE_OPTICALFLOW_MULTICHANNEL,
-                      MODE_HYBRID_13CHANNEL, MODE_HYBRID_16CHANNEL]
+                      MODE_HYBRID_13CHANNEL, MODE_HYBRID_16CHANNEL,
+                      MODE_OPTICALFLOWONLY_6CHANNEL, MODE_MASKOPTICALFLOWONLY_7CHANNEL]
 
     # Modes which utilize time-step, i.e., which take additional time-step dimensions like (None, 3, 224, 224, 3).
     TIMESTEP_MODES = [MODE_SEQUENCE, MODE_MASK_MOG2_SEQUENCE]
@@ -112,8 +116,9 @@ class PipelineGenerator(object):
                    MODE_SEQUENCE,
                    MODE_MASK_MOG2_SINGLE, MODE_MASK_MOG2_SEQUENCE, MODE_MASK_MOG2_MULTICHANNEL,
                    MODE_OPTICALFLOW_SINGLE, MODE_OPTICALFLOW_MULTICHANNEL,
-                   MODE_HYBRID_13CHANNEL, MODE_HYBRID_16CHANNEL]
-    
+                   MODE_HYBRID_13CHANNEL, MODE_HYBRID_16CHANNEL,
+                   MODE_OPTICALFLOWONLY_6CHANNEL, MODE_MASKOPTICALFLOWONLY_7CHANNEL]
+
     def __init__(self, dataset_file, images_dir, sequence_image_count=3,
                  label_name='has_animal', mode=MODE_ALL, image_size=(224, 224),
                  image_idx=1, resize=None, is_training=True,
@@ -155,9 +160,11 @@ class PipelineGenerator(object):
             self.MODE_OPTICALFLOW_MULTICHANNEL: self._parse_data_opticalflow_multichannel,
             self.MODE_HYBRID_13CHANNEL: self._parse_data_hybrid_13channel,
             self.MODE_HYBRID_16CHANNEL: self._parse_data_hybrid_16channel,
+            self.MODE_OPTICALFLOWONLY_6CHANNEL: self._parse_data_opticalflowonly_6channel,
+            self.MODE_MASKOPTICALFLOWONLY_7CHANNEL: self._parse_data_maskopticalflowonly_7channel,
             self.MODE_SINGLE: self._parse_data_single
         }
-        
+
         self._parse_data = self._parser_map[self._mode]
 
 
@@ -475,6 +482,41 @@ class PipelineGenerator(object):
 
         # Append all the images and the mask
         final_image = tf.concat(images, axis=2)
+        return final_image, label
+
+    def _parse_data_opticalflowonly_6channel(self, metadata, label):
+        seed = np.random.randint(1000)
+        # Read the opticalflow 1 and 2 images.
+        opticalflow_1 = tf.io.read_file(tf.strings.join([self._images_dir, metadata['opticalflowGF_1']]))
+        opticalflow_1 = self._decode_img(opticalflow_1)  # Treat opticalflow as a normal image since it is RGB image.
+        opticalflow_1 = self._augment_img(opticalflow_1, seed, should_skip_color_aug=True)
+
+        opticalflow_2 = tf.io.read_file(tf.strings.join([self._images_dir, metadata['opticalflowGF_2']]))
+        opticalflow_2 = self._decode_img(opticalflow_2)  # Treat opticalflow as a normal image since it is RGB image.
+        opticalflow_2 = self._augment_img(opticalflow_2, seed, should_skip_color_aug=True)
+
+        # Append the opticalflow channels to the image
+        final_image = tf.concat([opticalflow_1, opticalflow_2], axis=2)
+        return final_image, label
+
+    def _parse_data_maskopticalflowonly_7channel(self, metadata, label):
+        seed = np.random.randint(1000)
+        # Read the opticalflow 1 and 2 images.
+        opticalflow_1 = tf.io.read_file(tf.strings.join([self._images_dir, metadata['opticalflowGF_1']]))
+        opticalflow_1 = self._decode_img(opticalflow_1)  # Treat opticalflow as a normal image since it is RGB image.
+        opticalflow_1 = self._augment_img(opticalflow_1, seed, should_skip_color_aug=True)
+
+        opticalflow_2 = tf.io.read_file(tf.strings.join([self._images_dir, metadata['opticalflowGF_2']]))
+        opticalflow_2 = self._decode_img(opticalflow_2)  # Treat opticalflow as a normal image since it is RGB image.
+        opticalflow_2 = self._augment_img(opticalflow_2, seed, should_skip_color_aug=True)
+
+        # Read and augment the mask. Add it to the list
+        mask = tf.io.read_file(tf.strings.join([self._images_dir, metadata['mask_MOG2']]))
+        mask = self._decode_img(mask, is_mask=True)
+        mask = self._augment_img(mask, seed, should_skip_color_aug=True)
+
+        # Append the opticalflow channels to the image
+        final_image = tf.concat([opticalflow_1, opticalflow_2, mask], axis=2)
         return final_image, label
 
     def get_size(self):
