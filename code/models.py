@@ -777,10 +777,10 @@ def resnet152_15channel_allpretrained_opticalflow(input_shape, is_training=False
     return model
 
 
-def resnet152_16channel_opticalflow(input_shape, is_training=False, num_classes=1, learning_rate=0.001):
+def resnet152_13channel_hybrid(input_shape, is_training=False, num_classes=1, learning_rate=0.001):
     # XXX: Lots of redundant  code.
     # This is the only line that changes.
-    model_name = "resnet152_16channel_opticalflow"
+    model_name = "resnet152_13channel_hybrid"
 
     weights_file = os.path.join(os.getcwd(), "..", "data", "%s_weights.npy" % model_name)
     url = "https://capstonestorageaccount.blob.core.windows.net/capstone-container/%s" % os.path.basename(weights_file)
@@ -816,10 +816,10 @@ def resnet152_16channel_opticalflow(input_shape, is_training=False, num_classes=
     return model
 
 
-def resnet152_13channel_opticalflow(input_shape, is_training=False, num_classes=1, learning_rate=0.001):
+def resnet152_16channel_hybrid(input_shape, is_training=False, num_classes=1, learning_rate=0.001):
     # XXX: Lots of redundant  code.
     # This is the only line that changes.
-    model_name = "resnet152_13channel_opticalflow"
+    model_name = "resnet152_16channel_hybrid"
 
     weights_file = os.path.join(os.getcwd(), "..", "data", "%s_weights.npy" % model_name)
     url = "https://capstonestorageaccount.blob.core.windows.net/capstone-container/%s" % os.path.basename(weights_file)
@@ -890,8 +890,8 @@ AVAILABLE_MODEL_ARCHS = {
     "resnet152_15channel_allpretrained_opticalflow": resnet152_15channel_allpretrained_opticalflow,
 
     # Hybrid Models with Optical Flow and MOG2 Mask.
-    "resnet152_16channel_opticalflow": resnet152_16channel_opticalflow,
-    "resnet152_13channel_opticalflow": resnet152_13channel_opticalflow
+    "resnet152_13channel_hybrid": resnet152_13channel_hybrid,
+    "resnet152_16channel_hybrid": resnet152_16channel_hybrid
 }
 
 
