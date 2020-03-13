@@ -13,7 +13,31 @@ tensorflow version 2.1.0
 All the experiments were run inside a docker that contained the latest tensorflow version along with a Jupyter notebook(not a mandatory requirement)
 
 ### Installing
-To install the docker on your local machine use the following command:
+To install and run the docker on a vm follow these steps:
+1. Pull the docker image:
 ```
 docker pull tensorflow/tensorflow:latest-gpu-py3-jupyter
+```
+2. Start the docker on port 8889:
+```
+docker run -itd --gpus all -p 8889:8889 -e USER_HOME=$HOME/<folder_to_run_docker> -v /folder_to_run_docker:/folder_to_run_docker tensorflow/tensorflow:latest-gpu-py3-jupyter bash
+```
+3. Run the docker ps command to get the image name
+
+```
+docker ps
+```
+4. Run the docker with the image name using the following command:
+```
+docker exec -it <docker_image_name> /bin/bash
+```
+
+If any of the above commands do not run, please run these commands as root user.
+
+After successfull installation of the docker, run the following commands to install the python libraries inside the docker environment:
+```
+pip install pandas
+pip install scikit-learn
+pip install wget
+apt-get install less
 ```
