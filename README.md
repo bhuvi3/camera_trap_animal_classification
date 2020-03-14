@@ -34,7 +34,7 @@ docker exec -it <docker_container_name> /bin/bash
 
 If any of the above commands do not run, please run these commands as root user.
 
-After successfull installation of the docker, run the following commands to install the python libraries inside the docker environment:
+After successful installation of the docker, run the following commands to install the python libraries inside the docker environment:
 ```
 pip install pandas
 pip install scikit-learn
