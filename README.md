@@ -41,3 +41,29 @@ pip install scikit-learn
 pip install wget
 apt-get install less
 ```
+### TODO
+How to install if not working on a vm
+
+### Files
+1. data_pipeline.py: This file returns a tensorflow dataset to be used during the training phase. This file has the definitions for the different modes in the training pipeline, depending on the training method to be used i.e single image mode or a sequence mode.
+
+2. train_pipeline.py: This file initiates the training phase. Command line arguments are passed which mention what type of mode is to be used for training, training epochs, learning rate, etc all of which are mentioned in the file and shown in an example below
+
+3. models.py: This file contains all the different models that have been tried and experimented with. 
+
+4. inference_pipeline.py: This file runs the inference after training has been completed. It generates a folder which contains the ROC_AUC plot and stores the predictions of each sequence in a pickle file.
+
+### Example
+In the first run, we would advice to run a script that tests the data_pipeline.py code on a small trial dataset.
+
+```
+python train_pipeline.py --train-meta-file <final_dataset_train-trial.csv> --val-meta-file <final_dataset_val-trial.csv> --images-dir <images_directory>/ --out-dir <baseline-trial-1> --model-arch <mode_arch_name> --data-pipeline-mode <mode_name> --batch-size <batch_size> --epochs <epochs_count> --learning-rate <learning_rate> --image-size <image_size>
+```
+If that goes through without any errors, run the same script with the actual train dataset to train the model.
+During the training phase in the sequence mode, if you get an error with the following error: [],[]...shape not correct, please re run the script again.
+
+Run the inference script after training has completed
+
+```
+python inference_pipeline.py --test-meta-file <final_dataset_test_balanced-shuffled.csv> --images-dir <images_directory>/ --out-dir inference_outputs/baseline_4/val_acc --batch-size <batch_size> --trained-model-arch <model_arch_name> --trained-checkpoint-dir <trained_model_directory> --image-size <image_size> > <log_filename> 2>&1 &
+```
