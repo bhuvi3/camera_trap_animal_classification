@@ -22,14 +22,14 @@ docker pull tensorflow/tensorflow:latest-gpu-py3-jupyter
 ```
 docker run -itd --gpus all -p 8889:8889 -e USER_HOME=$HOME/<folder_to_run_docker> -v /folder_to_run_docker:/folder_to_run_docker tensorflow/tensorflow:latest-gpu-py3-jupyter bash
 ```
-3. Run the docker ps command to get the image name
+3. Run the docker ps command to get the container name
 
 ```
 docker ps
 ```
-4. Run the docker with the image name using the following command:
+4. Run the docker with the container name using the following command:
 ```
-docker exec -it <docker_image_name> /bin/bash
+docker exec -it <docker_container_name> /bin/bash
 ```
 
 If any of the above commands do not run, please run these commands as root user.
