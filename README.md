@@ -4,7 +4,9 @@ The main idea behind the problem statement is trying to exploit the information 
 
 ### Getting Started
 You should be able to clone this repository with the following command:
+```sh
 git clone https://github.com/bhuvi3/camera_trap_animal_classification.git
+```
 
 ### Requirements
 This project was run on a machine with a GPU. Basic requirements would include:
