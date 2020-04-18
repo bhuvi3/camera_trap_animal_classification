@@ -302,13 +302,13 @@ python inference_pipeline.py --test-meta-file ../data/loc_final_dataset_test_bal
 
 
 # Model: resnet50_lstm_avg_pool_loc
+TODO: Verify @Yash
 - training
-TODO: @Yash
-
-[gpumachine-4, TODO]
+python train_pipeline.py --train-meta-file ../data/loc_final_dataset_train_balanced-shuffled.csv --val-meta-file ../data/loc_final_dataset_val_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/resnet50_lstm_avg_pool_loc --model-arch resnet50_pretrained_imagenet_lstm_avg_pool --data-pipeline-mode mode_sequence --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/resnet50_lstm_avg_pool_loc.log 2>&1 & [gpumachine-4, IN PROCESS(10591)]
 
 - inference
-TODO: @Yash
+python inference_pipeline.py --test-meta-file ../data/loc_final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/resnet50_lstm_avg_pool_loc/val_auc --batch-size 16 --trained-model-arch resnet50_pretrained_imagenet_lstm_avg_pool --trained-checkpoint-dir ../trained_models/resnet50_lstm_avg_pool_loc/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_sequence > ../logs/inference-resnet50_lstm_avg_pool_loc-val_auc.log 2>&1
+
 
 # Model: mask_MOG2_4channel_1_loc
 - training
@@ -344,7 +344,7 @@ python inference_pipeline.py --test-meta-file ../data/loc_final_dataset_test_bal
 
 # Model: hybrid_13channel_allpretrained_1_loc
 - training
-python train_pipeline.py --train-meta-file ../data/loc_final_dataset_train_balanced-shuffled.csv --val-meta-file ../data/loc_final_dataset_val_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/hybrid_13channel_allpretrained_1_loc --model-arch resnet152_13channel_allpretrained_hybrid --data-pipeline-mode mode_hybrid_13channel --num-channels 13 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/hybrid_13channel_allpretrained_1_loc.log 2>&1 & [gpumachine-4, TODO]
+python train_pipeline.py --train-meta-file ../data/loc_final_dataset_train_balanced-shuffled.csv --val-meta-file ../data/loc_final_dataset_val_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/hybrid_13channel_allpretrained_1_loc --model-arch resnet152_13channel_allpretrained_hybrid --data-pipeline-mode mode_hybrid_13channel --num-channels 13 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/hybrid_13channel_allpretrained_1_loc.log 2>&1 & [gpumachine-4, IN PROCESS(10970)]
 
 - inference
 python inference_pipeline.py --test-meta-file ../data/loc_final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/hybrid_13channel_allpretrained_1_loc/val_auc --batch-size 16 --trained-model-arch resnet152_13channel_allpretrained_hybrid --trained-checkpoint-dir ../trained_models/hybrid_13channel_allpretrained_1_loc/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_hybrid_13channel --num-channels 13 > ../logs/inference-hybrid_13channel_allpretrained_1_loc-val_auc.log 2>&1
@@ -352,7 +352,7 @@ python inference_pipeline.py --test-meta-file ../data/loc_final_dataset_test_bal
 
 # Model: opticalflowonly_6channel_allpretrained_1_loc
 - training
-python train_pipeline.py --train-meta-file ../data/loc_final_dataset_train_balanced-shuffled.csv --val-meta-file ../data/loc_final_dataset_val_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflowonly_6channel_allpretrained_1_loc --model-arch resnet152_6channel_allpretrained_opticalflow --data-pipeline-mode mode_opticalflowonly_6channel --num-channels 6 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/opticalflowonly_6channel_allpretrained_1_loc.log 2>&1 & [gpumachine-3, IN PROCESS(5711)]
+python train_pipeline.py --train-meta-file ../data/loc_final_dataset_train_balanced-shuffled.csv --val-meta-file ../data/loc_final_dataset_val_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/opticalflowonly_6channel_allpretrained_1_loc --model-arch resnet152_6channel_allpretrained_opticalflow --data-pipeline-mode mode_opticalflowonly_6channel --num-channels 6 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/opticalflowonly_6channel_allpretrained_1_loc.log 2>&1 & [gpumachine-3, COMPLETED]
 
 - inference
 python inference_pipeline.py --test-meta-file ../data/loc_final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/opticalflowonly_6channel_allpretrained_1_loc/val_auc --batch-size 16 --trained-model-arch resnet152_6channel_allpretrained_opticalflow --trained-checkpoint-dir ../trained_models/opticalflowonly_6channel_allpretrained_1_loc/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_opticalflowonly_6channel --num-channels 6 > ../logs/inference-opticalflowonly_6channel_allpretrained_1_loc-val_auc.log 2>&1
@@ -360,7 +360,7 @@ python inference_pipeline.py --test-meta-file ../data/loc_final_dataset_test_bal
 
 # Model: maskopticalflowonly_7channel_allpretrained_1_loc
 - training
-python train_pipeline.py --train-meta-file ../data/loc_final_dataset_train_balanced-shuffled.csv --val-meta-file ../data/loc_final_dataset_val_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/maskopticalflowonly_7channel_allpretrained_1_loc --model-arch resnet152_7channel_allpretrained_maskopticalflow --data-pipeline-mode mode_maskopticalflowonly_7channel --num-channels 7 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/maskopticalflowonly_7channel_allpretrained_1_loc.log 2>&1 & [gpumachine-4, IN PROCEESS(5352)]
+python train_pipeline.py --train-meta-file ../data/loc_final_dataset_train_balanced-shuffled.csv --val-meta-file ../data/loc_final_dataset_val_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../trained_models/maskopticalflowonly_7channel_allpretrained_1_loc --model-arch resnet152_7channel_allpretrained_maskopticalflow --data-pipeline-mode mode_maskopticalflowonly_7channel --num-channels 7 --batch-size 16 --epochs 10 --learning-rate 0.0001 --image-size 224 --patience 3 --min-delta-auc 0.005 > ../logs/maskopticalflowonly_7channel_allpretrained_1_loc.log 2>&1 & [gpumachine-4, COMPLETED]
 
 - inference
 python inference_pipeline.py --test-meta-file ../data/loc_final_dataset_test_balanced-shuffled.csv --images-dir ../../wellington_data/images-resized-224/ --out-dir ../inference_outputs/maskopticalflowonly_7channel_allpretrained_1_loc/val_auc --batch-size 16 --trained-model-arch resnet152_7channel_allpretrained_maskopticalflow --trained-checkpoint-dir ../trained_models/maskopticalflowonly_7channel_allpretrained_1_loc/best_model_dir-auc.ckpt --image-size 224 --data-pipeline-mode mode_maskopticalflowonly_7channel --num-channels 7 > ../logs/inference-maskopticalflowonly_7channel_allpretrained_1_loc-val_auc.log 2>&1
