@@ -287,9 +287,9 @@ python generate_optical_flow_images.py --metadata-file ../data/final_dataset_tes
 #----------------------------------------
 
 ### Experiment with train-test splits based on the camera-sites.
-# train set (up-sampled): loc_final_dataset_train_balanced-shuffled.csv (89777)
-# val set (down-sampled): loc_final_dataset_val_balanced-shuffled.csv (5969)
-# test set (down-sampled): loc_final_dataset_test_balanced-shuffled.csv (6453)
+# train set (up-sampled): loc_final_dataset_train_balanced-shuffled.csv (89777)	| unique: 53856	| unique sites: 111
+# val set (down-sampled): loc_final_dataset_val_balanced-shuffled.csv (5969)	| unique: 16412	| unique sites: 36
+# test set (down-sampled): loc_final_dataset_test_balanced-shuffled.csv (6453)	| unique: 18450	| unieuq sites: 35
 
 
 ### Train and Infererence the models:
