@@ -366,6 +366,18 @@ python inference_pipeline.py --test-meta-file ../data/loc_final_dataset_test_bal
 
 
 # ---------------------------------------
+# Paper details:
+
+### Sequence ids presented in sequence_example image.
+left-top (animal, full daylight): 29125     |    info: 29125,"image1","110116151818047bs131.jpg","BIRD","047b","1/11/2016 15:18","s13"
+
+right-top (animal, night time): 40156       |    info: 40156,"image1","060216224444038bs163.jpg","HEDGEHOG","038b","2/6/2016 22:44","s16"
+
+left-bottom (animal, low daylight): 17068   |    info: 17068,"image1","160216060344039bs021.jpg","BIRD","039b","2/16/2016 6:03","s02"
+
+right-bottom (empty, full daylight): 49305  |    info: 49305,"image1","010416125916018c5171.jpg","NOTHINGHERE","018c","4/1/2016 12:59","517"
+
+# ---------------------------------------
 
 # XXX: Keep pushing this section towards the end. This summary might help later in future.
 ### Learnings (include mistakes and self-realizations):
