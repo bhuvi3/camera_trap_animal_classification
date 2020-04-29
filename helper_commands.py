@@ -377,6 +377,10 @@ left-bottom (animal, low daylight): 17068   |    info: 17068,"image1","160216060
 
 right-bottom (empty, full daylight): 49305  |    info: 49305,"image1","010416125916018c5171.jpg","NOTHINGHERE","018c","4/1/2016 12:59","517"
 
+# Data upload:
+The data, trained models and inferene outputs uploaded to capstone_project container in storage account ()
+Public Blob read-access SAS URL till 2021: https://resourcegroupcapstonedia.blob.core.windows.net/?sv=2019-10-10&ss=bfqt&srt=sco&sp=rl&se=2021-04-29T13:21:03Z&st=2020-04-29T05:21:03Z&spr=https&sig=rk8VhQ%2BTKhRmfSLAEgeUjmCFNBTksuSPkKYPBefbmrE%3D
+
 # ---------------------------------------
 
 # XXX: Keep pushing this section towards the end. This summary might help later in future.
