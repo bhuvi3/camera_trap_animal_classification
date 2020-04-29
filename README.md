@@ -2,6 +2,9 @@
 This was the capstone project for graduate students of the Master of Science in Data Science program at University of Washington, Seattle.
 The main idea behind the problem statement is trying to exploit the information in sequences from camera trap images. The dataset contains sequences with 3 images in each sequence. Each sequence is associated with a label: '1' which means an animal is present in one or more images of the sequence, '0' which means there is no animal in all 3 images in the sequence. We form a baseline model which predicts whether an image has an animal or not i.e a single image classifier and then try to see if passing the sequence as an input to a different model helps increase our metric. 
 
+## Detailed Report
+The detailed report of this work has been published on arXiv in [this link (TODO)](TODO: add arXiv link). Please contact us for access to process data and results.
+
 ### Getting Started
 You should be able to clone this repository with the following command:
 ```sh
