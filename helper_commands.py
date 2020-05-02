@@ -381,6 +381,18 @@ right-bottom (empty, full daylight): 49305  |    info: 49305,"image1","010416125
 The data, trained models and inferene outputs uploaded to capstone_project container in storage account (resourcegroupcapstonedia).
 Public Blob read-access SAS URL till 2021: https://resourcegroupcapstonedia.blob.core.windows.net/?sv=2019-10-10&ss=bfqt&srt=sco&sp=rl&se=2021-04-29T13:21:03Z&st=2020-04-29T05:21:03Z&spr=https&sig=rk8VhQ%2BTKhRmfSLAEgeUjmCFNBTksuSPkKYPBefbmrE%3D
 
+# ArXiv details:
+Title: Sequence Information Channel Concatenation for Improving Camera Trap Image Burst Classification
+
+Authors: Bhuvan Malladihalli Shashidhara, Darshan Mehta, Yash Kale, Dan Morris, Megan Hazen
+
+Abstract:
+Camera Traps are extensively used to observe wildlife in their natural habitat without disturbing the ecosystem. This could help in the early detection of natural or human threats to animals, and help towards ecological conservation. Currently, a massive number of such camera traps have been deployed at various ecological conservation areas around the world, collecting data for decades, thereby requiring automation to detect images containing animals. Existing systems perform classification to detect if images contain animals by considering a single image. However, due to challenging scenes with animals camouflaged in their natural habitat, it sometimes becomes difficult to identify the presence of animals from merely a single image. We hypothesize that a short burst of images instead of a single image, assuming that the animal moves, makes it much easier for a human as well as a machine to detect the presence of animals. In this work, we explore a variety of approaches, and measure the impact of using short image sequences (burst of 3 images) on improving the camera trap image classification. We show that concatenating masks containing sequence information and the images from the 3-image-burst across channels, improves the ROC AUC by 20% on a test-set from unseen camera-sites, as compared to an equivalent model that learns from a single image.
+
+Comments: 9 pages, 4 figures, 2 tables. Git repository can be found at: https://github.com/bhuvi3/camera_trap_animal_classification.
+
+ACM-class: I.4.9; I.4.10; I.2.10
+
 # ---------------------------------------
 
 # XXX: Keep pushing this section towards the end. This summary might help later in future.
